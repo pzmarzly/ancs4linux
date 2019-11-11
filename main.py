@@ -78,7 +78,6 @@ nsControl.StartNotify()
 dsControl.StartNotify()
 nsLastMsg = nsProps.Get("org.bluez.GattCharacteristic1", "Value")
 dsLastMsg = dsProps.Get("org.bluez.GattCharacteristic1", "Value")
-lastNotificationTime = 0
 while True:
     time.sleep(1.0 / resolution)
     msg = nsProps.Get("org.bluez.GattCharacteristic1", "Value")
@@ -91,12 +90,8 @@ while True:
                 1, 65535, # title
                 3, 65535, # message
             ))
-            if time.time_ns() - lastNotificationTime < 1000000 / resolution * 1.5:
-                print("Notification spam! Skipping notification...")
-            else:
-                print("New notification! Asking for details...")
-                cpControl.WriteValue(fetchAttributes, {})
-                lastNotificationTime = time.time_ns()
+            print("New notification! Asking for details...")
+            cpControl.WriteValue(fetchAttributes, {})
     msg = dsProps.Get("org.bluez.GattCharacteristic1", "Value")
     if msg != dsLastMsg:
         dsLastMsg = msg
