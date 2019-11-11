@@ -85,10 +85,11 @@ while True:
         nsLastMsg = msg
         [op, _, _, _, id] = struct.unpack("<BBBBI", bytearray(msg))
         if op == 0:
-            fetchAttributes = list(struct.pack("<BIBBHBH", 0, id,
-                0, # app id
-                1, 65535, # title
-                3, 65535, # message
+            fetchAttributes = list(struct.pack(
+                "<BIBBHBH", 0, id,
+                0,         # app id
+                1, 65535,  # title
+                3, 65535,  # message
             ))
             print("New notification! Asking for details...")
             cpControl.WriteValue(fetchAttributes, {})
