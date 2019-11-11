@@ -5,14 +5,21 @@ import time
 import struct
 import signal
 import subprocess
+import argparse
 from xml.dom import minidom
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--hci", metavar="INT", type=int, default=0,
+    help="use Bluetooth hciX (default 0, see `hcitool dev')")
+parser.add_argument("--resolution", metavar="INT", type=int, default=20,
+    help="polling rate (default 20 per second)")
+args = parser.parse_args()
+hciID = "hci%d" % args.hci
+resolution = args.resolution
 
 def signal_handler(sig, frame):
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
-
-hciID = "hci0"
-resolution = 20
 
 # https://developer.apple.com/library/archive/documentation/CoreBluetooth/Reference/AppleNotificationCenterServiceSpecification/Introduction/Introduction.html
 
