@@ -137,4 +137,4 @@ while True:
     if batteryState != batteryLast:
         batteryLast = batteryState
         print("Battery is at %d percent" % batteryState)
-        tryRunning(['handlers/battery.sh', batteryState])
+        tryRunning(['handlers/battery.sh', "%s" % batteryState])
