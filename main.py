@@ -126,15 +126,15 @@ while True:
         messageSize, msg = struct.unpack("<BH", msg[:3])[1], msg[3:]
         message, msg = msg[:messageSize], msg[messageSize:]
 
-        appID = appID.decode('utf8', errors='ignore')
-        title = title.decode('utf8', errors='ignore')
-        message = message.decode('utf8', errors='ignore')
+        appID = appID.decode("utf8", errors="ignore")
+        title = title.decode("utf8", errors="ignore")
+        message = message.decode("utf8", errors="ignore")
         print("From: %s (%s)" % (title, appID))
         print(message)
-        tryRunning(['handlers/notification.sh', title, appID, message])
+        tryRunning(["handlers/notification.sh", title, appID, message])
 
     batteryState = battery.Get("org.bluez.Battery1", "Percentage")
     if batteryState != batteryLast:
         batteryLast = batteryState
         print("Battery is at %d percent" % batteryState)
-        tryRunning(['handlers/battery.sh', "%s" % batteryState])
+        tryRunning(["handlers/battery.sh", "%s" % batteryState])
