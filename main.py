@@ -79,7 +79,7 @@ for deviceID in devices:
                 dataSource = characteristic
 
 if notificationSource is None or controlPoint is None or dataSource is None:
-    print("iPhone ANCS not found!")
+    print("iPhone not found or doesn't implement ANCS!")
     exit(1)
 
 device = bus.get_object("org.bluez", "/org/bluez/%s/%s" % (hciID, iphoneID))
@@ -131,10 +131,10 @@ while True:
         message = message.decode("utf8", errors="ignore")
         print("From: %s (%s)" % (title, appID))
         print(message)
-        tryRunning(["handlers/notification.sh", title, appID, message])
+        tryRunning(["handlers/notification", title, appID, message])
 
     batteryState = battery.Get("org.bluez.Battery1", "Percentage")
     if batteryState != batteryLast:
         batteryLast = batteryState
         print("Battery is at %d percent" % batteryState)
-        tryRunning(["handlers/battery.sh", "%s" % batteryState])
+        tryRunning(["handlers/battery", "%s" % batteryState])

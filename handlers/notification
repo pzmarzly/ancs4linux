@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # $1 - app name
 # $2 - package name
