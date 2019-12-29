@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# https://developer.apple.com/library/archive/documentation/CoreBluetooth/Reference/AppleNotificationCenterServiceSpecification/Introduction/Introduction.html
 import sys
 import dbus
 import time
@@ -6,9 +7,9 @@ import struct
 import signal
 import subprocess
 import argparse
-from xml.dom import minidom
+from search_for_device import search_for_device
 
-def tryRunning(argv):
+def tryPopen(argv):
     try:
         subprocess.Popen(argv)
     except Exception as e:
@@ -27,60 +28,12 @@ def signal_handler(sig, frame):
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
-# https://developer.apple.com/library/archive/documentation/CoreBluetooth/Reference/AppleNotificationCenterServiceSpecification/Introduction/Introduction.html
-
-notificationSource = None
-controlPoint = None
-dataSource = None
-iphoneID = None
-
-ancsID = "7905f431-b5ce-4e99-a40f-4b1e122d00d0"
-notificationSourceID = "9fbf120d-6301-42d9-8c58-25e699a21dbd"
-controlPointID = "69d1d8f3-45e1-49a8-9821-9bbdfdaad9d9"
-dataSourceID = "22eac6e9-24d6-4bb5-be44-b36ace7c7bfb"
-
 bus = dbus.SystemBus()
-hci = bus.get_object("org.bluez", "/org/bluez/%s" % hciID)
-devices = hci.Introspect()
-devices = minidom.parseString(devices).getElementsByTagName("node")
-devices = map(lambda x: x.getAttribute("name"), devices)
-devices = list(filter(lambda x: x.startswith("dev_"), devices))
-for deviceID in devices:
-    device = bus.get_object("org.bluez", "/org/bluez/%s/%s" % (hciID, deviceID))
-    props = dbus.Interface(device, "org.freedesktop.DBus.Properties")
-    connected = props.Get("org.bluez.Device1", "Connected")
-    if not connected:
-        continue
-    services = device.Introspect()
-    services = minidom.parseString(services).getElementsByTagName("node")
-    services = map(lambda x: x.getAttribute("name"), services)
-    services = list(filter(lambda x: x.startswith("service"), services))
-    for serviceID in services:
-        service = bus.get_object("org.bluez", "/org/bluez/%s/%s/%s" % (hciID, deviceID, serviceID))
-        props = dbus.Interface(service, "org.freedesktop.DBus.Properties")
-        id = props.Get("org.bluez.GattService1", "UUID")
-        if id != ancsID:
-            continue
-        print("Found an iPhone!")
-        characteristics = service.Introspect()
-        characteristics = minidom.parseString(characteristics).getElementsByTagName("node")
-        characteristics = map(lambda x: x.getAttribute("name"), characteristics)
-        characteristics = list(filter(lambda x: x.startswith("char"), characteristics))
-        for characteristicID in characteristics:
-            characteristic = bus.get_object("org.bluez", "/org/bluez/%s/%s/%s/%s" % (hciID, deviceID, serviceID, characteristicID))
-            props = dbus.Interface(characteristic, "org.freedesktop.DBus.Properties")
-            id = props.Get("org.bluez.GattCharacteristic1", "UUID")
-            if id == notificationSourceID:
-                notificationSource = characteristic
-                iphoneID = deviceID
-            elif id == controlPointID:
-                controlPoint = characteristic
-            elif id == dataSourceID:
-                dataSource = characteristic
-
-if notificationSource is None or controlPoint is None or dataSource is None:
+device = search_for_device(bus, hciID)
+if device is None:
     print("iPhone not found or doesn't implement ANCS!")
     exit(1)
+notificationSource, controlPoint, dataSource, iphoneID = device
 
 device = bus.get_object("org.bluez", "/org/bluez/%s/%s" % (hciID, iphoneID))
 battery = dbus.Interface(device, "org.freedesktop.DBus.Properties")
@@ -131,10 +84,10 @@ while True:
         message = message.decode("utf8", errors="ignore")
         print("From: %s (%s)" % (title, appID))
         print(message)
-        tryRunning(["handlers/notification", title, appID, message])
+        tryPopen(["handlers/notification", title, appID, message])
 
     batteryState = battery.Get("org.bluez.Battery1", "Percentage")
     if batteryState != batteryLast:
         batteryLast = batteryState
         print("Battery is at %d percent" % batteryState)
-        tryRunning(["handlers/battery", "%s" % batteryState])
+        tryPopen(["handlers/battery", "%s" % batteryState])
