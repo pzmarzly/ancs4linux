@@ -24,6 +24,13 @@ class HCI:
         dataSource = None
         deviceID = None
 
+        # TODO: use functional pattern to simplify the loop
+        # characteristics = self.all_children(hci, "dev_")
+        #   .filter(lambda x: (...).connected)
+        #   .map(lambda x: self.all_children(x, "service"))
+        #   .filter(lambda x: uuid == ancsID)
+        # notificationSource = characteristics
+        #   .first(lambda x: uuid == notificationSourceID)
         hci = self.bus.get_object("org.bluez", "%s" % self.path)
         for deviceID in self.all_children(hci, "dev_"):
             device = self.bus.get_object("org.bluez", "%s/%s" % (self.path, deviceID))
