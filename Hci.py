@@ -8,17 +8,17 @@ notificationSourceID = "9fbf120d-6301-42d9-8c58-25e699a21dbd"
 controlPointID = "69d1d8f3-45e1-49a8-9821-9bbdfdaad9d9"
 dataSourceID = "22eac6e9-24d6-4bb5-be44-b36ace7c7bfb"
 
-class HCI:
-    def __init__(self, id: int):
+class Hci:
+    def __init__(self, id):
         self.path = "/org/bluez/hci%d" % id
         self.bus = dbus.SystemBus()
-    def all_children(self, obj: dbus.Object, prefix: str) -> List[str]:
+    def all_children(self, obj, prefix):
         children = obj.Introspect()
         children = minidom.parseString(children).getElementsByTagName("node")
         children = map(lambda x: x.getAttribute("name"), children)
         children = list(filter(lambda x: x.startswith(prefix), children))
         return children
-    def search_for_device(self) -> Optional[Device]:
+    def search_for_device(self):
         notificationSource = None
         controlPoint = None
         dataSource = None

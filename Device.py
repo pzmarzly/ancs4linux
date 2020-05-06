@@ -2,23 +2,22 @@ import time
 import struct
 import dbus
 from Handler import Handler
-from HCI import HCI
 
 class Device:
     def __init__(
             self,
-            hci: HCI,
-            notificationSource: dbus.Object,
-            controlPoint: dbus.Object,
-            dataSource: dbus.Object,
-            deviceID: str
+            hci,
+            notificationSource,
+            controlPoint,
+            dataSource,
+            deviceID
         ):
         self.hci = hci
         self.ns = notificationSource
         self.cp = controlPoint
         self.ds = dataSource
         self.id = deviceID
-    def main_loop(self, handler: Handler, resolution: int):
+    def main_loop(self, handler, resolution):
         device = self.hci.bus.get_object("org.bluez", "%s/%s" % (self.hci.path, self.id))
         battery = dbus.Interface(device, "org.freedesktop.DBus.Properties")
 

@@ -4,7 +4,7 @@ import sys
 import signal
 import argparse
 import time
-from HCI import HCI
+from Hci import Hci
 from Handler import DefaultHandler
 
 parser = argparse.ArgumentParser()
@@ -22,7 +22,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 handler = DefaultHandler()
 
-hci = HCI(hciID)
+hci = Hci(hciID)
 while True:
     device = hci.search_for_device()
     while device is None:
