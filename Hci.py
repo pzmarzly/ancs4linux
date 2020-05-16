@@ -51,7 +51,9 @@ class Hci:
                     continue
                 for characteristicID in self.all_children(service, "char"):
                     characteristic = self.bus.get_object(
-                        "org.bluez", "%s/%s/%s/%s" % (self.path, deviceID, serviceID, characteristicID))
+                        "org.bluez", "%s/%s/%s/%s" % (self.path,
+                                                      deviceID, serviceID,
+                                                      characteristicID))
                     props = dbus.Interface(
                         characteristic, "org.freedesktop.DBus.Properties")
                     uuid = props.Get("org.bluez.GattCharacteristic1", "UUID")
@@ -63,6 +65,12 @@ class Hci:
                     elif uuid == dataSourceID:
                         dataSource = characteristic
 
-        if notificationSource is None or controlPoint is None or dataSource is None:
+        if notificationSource is None \
+                or controlPoint is None \
+                or dataSource is None:
             return None
-        return Device(self, notificationSource, controlPoint, dataSource, deviceID)
+        return Device(self,
+                      notificationSource,
+                      controlPoint,
+                      dataSource,
+                      deviceID)
