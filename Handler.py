@@ -21,6 +21,13 @@ class Handler:
         pass
 
 
+def runScript(argv):
+    try:
+        subprocess.Popen(argv)
+    except Exception as e:
+        print("Error: %s" % str(e))
+
+
 class DefaultHandler(Handler):
     def device_connected(self):
         print("Device connected")
@@ -34,9 +41,11 @@ class DefaultHandler(Handler):
     def notification_new(self, id, title, appID, message):
         print("From: %s (%s)" % (title, appID))
         print(message)
+        runScript(["handlers/notification", title, appID, message])
 
     def notification_removed(self, id):
         print("Removed notification %d" % id)
 
     def battery_changed(self, percentage):
         print("Battery is at %d percent" % percentage)
+        runScript(["handlers/battery", "%s" % percentage])
