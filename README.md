@@ -2,6 +2,8 @@
 
 This project lets you receive iOS and iPadOS notifications on your Linux desktop/laptop. No jailbreak needed. Work in progress. Feedback needed.
 
+![Photo of running script](shot0001.jpg)
+
 It uses [Apple Notification Center Service (ANCS)](https://developer.apple.com/library/archive/documentation/CoreBluetooth/Reference/AppleNotificationCenterServiceSpecification/Introduction/Introduction.html) - the same protocol that smartwatches use. I'm also considering implementing [Apple Media Service (AMS)](https://developer.apple.com/library/archive/documentation/CoreBluetooth/Reference/AppleMediaService_Reference/Introduction/Introduction.html), which allows controlling media playing on the phone, and redirecting phone audio to PC. Please let me know if it would be useful to anyone. I think redirecting calls to PC should also be possible (by having PC act as headset), but I don't have the need for that much tinkering.
 
 ## Installation and usage
@@ -16,14 +18,17 @@ It uses [Apple Notification Center Service (ANCS)](https://developer.apple.com/l
 
 The most reliable method I found:
 
+- Unpair your devices ("Forget this device" in iOS Settings).
 - Download and unpack [bluez-5.43 source](www.kernel.org/pub/linux/bluetooth/bluez-5.43.tar.xz).
 - Start `blueman` (Bluetooth Manager).
 - If you have multiple Bluetooth cards: edit the `for` loop in `find_adapter` in `/test/example-advertisement`.
-- Use the free [nRF Connect app](https://apps.apple.com/us/app/nrf-connect/id1054362403) to connect to your PC (it will advertise itself as a heart sensor).
+- Use the free [nRF Connect app](https://apps.apple.com/us/app/nrf-connect/id1054362403) to connect to your PC (it will advertise itself as a heart sensor). It should look [like this](https://imgur.com/wL7X7aK), click Connect there.
 - `blueman` will now handle pairing (compare PINs).
-- You are connected now, you can run `./main.py`.
+- You are connected now, you can run `./main.py`, the phone will display a popup whether to grant notification access to the PC.
 
 The success rate and pairing steps depend on your Bluetooth card. My Intel Wireless-AC 9462 card does not work, so I bought ASUS USB-BT400 card, it works fine. My previous Intel WiFi+BT card worked, but I don't remember the model and I sold that laptop already.
+
+Since it's Bluetooth we are talking about, it works only when the stars are aligned correctly. If it worked yesterday but you can't even see your device today, restart both your PC and your phone. On a positive side, though, you can be connected to many BLE devices at once. I don't have Apple Watch to test it, but at least the AirPods still work when using this script.
 
 It looks like iOS will forget about PC permissions/capabilities after a while (a week?), so the pairing has to be repeated.
 
