@@ -1,30 +1,32 @@
 import time
 import struct
 import dbus
-from Handler import Handler
+
 
 class Device:
     def __init__(
-            self,
-            hci,
-            notificationSource,
-            controlPoint,
-            dataSource,
-            deviceID
-        ):
+        self,
+        hci,
+        notificationSource,
+        controlPoint,
+        dataSource,
+        deviceID
+    ):
         self.hci = hci
         self.ns = notificationSource
         self.cp = controlPoint
         self.ds = dataSource
         self.id = deviceID
+
     def main_loop(self, handler, resolution):
-        device = self.hci.bus.get_object("org.bluez", "%s/%s" % (self.hci.path, self.id))
+        device = self.hci.bus.get_object(
+            "org.bluez", "%s/%s" % (self.hci.path, self.id))
         battery = dbus.Interface(device, "org.freedesktop.DBus.Properties")
 
         nsControl = dbus.Interface(self.ns, "org.bluez.GattCharacteristic1")
         nsProps = dbus.Interface(self.ns, "org.freedesktop.DBus.Properties")
         cpControl = dbus.Interface(self.cp, "org.bluez.GattCharacteristic1")
-        cpProps = dbus.Interface(self.cp, "org.freedesktop.DBus.Properties")
+        # cpProps = dbus.Interface(self.cp, "org.freedesktop.DBus.Properties")
         dsControl = dbus.Interface(self.ds, "org.bluez.GattCharacteristic1")
         dsProps = dbus.Interface(self.ds, "org.freedesktop.DBus.Properties")
 
@@ -68,7 +70,8 @@ class Device:
                 appID = appID.decode("utf8", errors="ignore")
                 title = title.decode("utf8", errors="ignore")
                 message = message.decode("utf8", errors="ignore")
-                handler.notification_new(id=id, title=title, appID=appID, message=message)
+                handler.notification_new(
+                    id=id, title=title, appID=appID, message=message)
 
             batteryState = battery.Get("org.bluez.Battery1", "Percentage")
             if batteryState != batteryLast:
