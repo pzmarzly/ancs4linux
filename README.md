@@ -67,3 +67,5 @@ Initially I tried using `bluepy`, but I couldn't get iPhone to pair (`setSecurit
 Useful tools: `bluetoothctl` (`menu gatt`), `qdbusviewer` (part of `qt5-tools` on Arch).
 
 The pairing process needs to be integrated. We can either do whatever `example-advertisement` does, or salvage the [`ble-ancs` project](https://github.com/robotastic/ble-ancs/blob/a88f4eea91360916456a40adaf51910e6e81ca40/index.js#L163).
+
+Sending iMessage messages would be useful too, and [it should be possible over "regular" (2.0) Bluetooth](https://news.ycombinator.com/item?id=23413394) via Message Access Profile.
