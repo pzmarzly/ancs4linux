@@ -1,6 +1,6 @@
 # iOS/iPadOS notification service client for Linux desktop
 
-This project lets you receive iOS and iPadOS notifications on your Linux desktop/laptop. No jailbreak needed. Work in progress. Feedback needed.
+This project lets you receive iOS and iPadOS notifications on your Linux desktop/laptop. No jailbreak needed. Work in progress. Feedback needed. [Reddit thread](https://www.reddit.com/r/linux/comments/gks3bt/ios_notifications_on_linux_desktop_over_bluetooth/).
 
 ![Photo of running script](shot0001.jpg)
 
