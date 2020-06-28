@@ -6,6 +6,12 @@ This project lets you receive iOS and iPadOS notifications on your Linux desktop
 
 It uses [Apple Notification Center Service (ANCS)](https://developer.apple.com/library/archive/documentation/CoreBluetooth/Reference/AppleNotificationCenterServiceSpecification/Introduction/Introduction.html) - the same protocol that smartwatches use. I'm also considering implementing [Apple Media Service (AMS)](https://developer.apple.com/library/archive/documentation/CoreBluetooth/Reference/AppleMediaService_Reference/Introduction/Introduction.html), which allows controlling media playing on the phone, and redirecting phone audio to PC. Please let me know if it would be useful to anyone. I think redirecting calls to PC should also be possible (by having PC act as headset), but I don't have the need for that much tinkering.
 
+Alternatives:
+
+- [Pusher](https://repo.packix.com/package/com.noahsaso.pusher/) - jailbreak required
+- [ForwardNotifier](https://github.com/Greg0109/ForwardNotifier) - jailbreak required
+- [Dell Mobile Connect](https://www.windowslatest.com/2020/04/11/run-dell-mobile-connect-on-any-windows-10-pc/) - Windows 10 required
+
 ## Installation and usage
 
 1. Install Python 3.7 and `python3-dbus` (Ubuntu) / `python-dbus` (Arch). You probably have that library already installed. I'm not sure whether Python 3.7 is necessary, but I haven't tested the program with earlier versions.
