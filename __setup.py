@@ -31,7 +31,7 @@ setup(
     package_dir={"": "."},
     packages=packages,
     python_requires=">=3.7",
-    install_requires=["click", "dbus-python", "PyGObject"],
+    install_requires=["click", "dasbus"],
     extras_require={
         "test": ["mypy", "black"],
     },

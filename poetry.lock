@@ -47,12 +47,12 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
-name = "dbus-python"
-version = "1.2.18"
-description = "Python bindings for libdbus"
+name = "dasbus"
+version = "1.6"
+description = "DBus library in Python 3"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [[package]]
 name = "importlib-metadata"
@@ -191,7 +191,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "6ef7c9acaf38b86b72dc2cf767acfa94154e8e67579879de35996332b93ed966"
+content-hash = "dfb16bea5bb32012094689585cf44d04c1aad5dd1ec8b10acfeab553c214cd73"
 
 [metadata.files]
 black = [
@@ -206,8 +206,9 @@ colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
 ]
-dbus-python = [
-    {file = "dbus-python-1.2.18.tar.gz", hash = "sha256:92bdd1e68b45596c833307a5ff4b217ee6929a1502f5341bae28fd120acf7260"},
+dasbus = [
+    {file = "dasbus-1.6-py3-none-any.whl", hash = "sha256:092878cab50142614656b405d2c1f5488a5070c01c2368d113b3840ddc0b6f6e"},
+    {file = "dasbus-1.6.tar.gz", hash = "sha256:149ad8fc8c3d298321ab50159b547ab2834899a89e47e21c6d42f2c92e56e94d"},
 ]
 importlib-metadata = [
     {file = "importlib_metadata-4.8.1-py3-none-any.whl", hash = "sha256:b618b6d2d5ffa2f16add5697cf57a46c76a56229b0ed1c438322e4e95645bd15"},

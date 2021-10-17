@@ -12,7 +12,7 @@ ancs4linux-ctl = 'ancs4linux.ctl.main:main'
 [tool.poetry.dependencies]
 python = "^3.7"
 click = "^8.0.3"
-dbus-python = "^1.2.18"
+dasbus = "^1.6"
 PyGObject = "^3.42.0"
 
 [tool.poetry.dev-dependencies]
