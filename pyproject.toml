@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "ancs4linux"
+version = "0.1.0"
+description = ""
+authors = ["pzmarzly <pawo2500@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.scripts]
+ancs4linux-server = 'ancs4linux.server.main:main'
+ancs4linux-ctl = 'ancs4linux.ctl.main:main'
+
+[tool.poetry.dependencies]
+python = "^3.7"
+click = "^8.0.3"
+dbus-python = "^1.2.18"
+PyGObject = "^3.42.0"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.910"
+black = "^21.9b0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
