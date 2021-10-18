@@ -7,6 +7,7 @@ license = "MIT"
 
 [tool.poetry.scripts]
 ancs4linux-server = 'ancs4linux.server.main:main'
+ancs4linux-desktop-integration = 'ancs4linux.desktop_integration.main:main'
 ancs4linux-ctl = 'ancs4linux.ctl.main:main'
 
 [tool.poetry.dependencies]

@@ -1,7 +1,7 @@
 import click
 from dasbus.loop import EventLoop
 from dasbus.connection import SessionMessageBus
-from ancs4linux.server.server_object import ServerObject
+from ancs4linux.server.server import Server
 
 
 @click.command()
@@ -14,6 +14,8 @@ from ancs4linux.server.server_object import ServerObject
 def main(dbus_path, config_file):
     loop = EventLoop()
     bus = SessionMessageBus()
-    bus.publish_object(dbus_path, ServerObject())
+    obj = Server()
+    bus.publish_object(dbus_path, obj)
     bus.register_service("pl.pzmarzly.ancs4linux")
+    obj.send_new_notification("xd")
     loop.run()
