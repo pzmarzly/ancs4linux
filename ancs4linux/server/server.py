@@ -3,7 +3,7 @@ from dasbus.server.interface import dbus_interface, dbus_signal
 from typing import cast, Any
 
 
-@dbus_interface("org.example.HelloWorld")
+@dbus_interface("ancs4linux.Server")
 class Server:
     def SetAdvertisingEnabled(self, enabled: Bool) -> None:
         pass

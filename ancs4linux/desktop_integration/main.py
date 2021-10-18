@@ -26,12 +26,10 @@ class Notification:
 
 
 @click.command()
-@click.option(
-    "--dbus-path", help="DBus path to observe", default="/pl/pzmarzly/ancs4linux"
-)
-def main(dbus_path):
+@click.option("--dbus-name", help="Server service name", default="ancs4linux.Server")
+def main(dbus_name):
     loop = EventLoop()
     bus = SessionMessageBus()
-    proxy: Any = bus.get_proxy("pl.pzmarzly.ancs4linux", dbus_path)
+    proxy: Any = bus.get_proxy(dbus_name, "/")
     proxy.NewNotification.connect(lambda json: Notification().show())
     loop.run()
