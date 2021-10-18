@@ -2,6 +2,7 @@ import click
 from dasbus.loop import EventLoop
 from dasbus.connection import SessionMessageBus
 from ancs4linux.server.server import Server
+from ancs4linux.common.types import NewNotification
 
 
 @click.command()
@@ -15,5 +16,5 @@ def main(dbus_name, config_file):
     obj = Server()
     bus.publish_object("/", obj)
     bus.register_service(dbus_name)
-    obj.send_new_notification("xd")
+    obj.send_new_notification(NewNotification(0, "xd", "xd2"))
     loop.run()
