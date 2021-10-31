@@ -4,16 +4,15 @@ import json
 
 @dataclass
 class NewNotification:
+    device_address: str
+    device_name: str
     id: int
     title: str
     description: str
 
     def to_json(self):
-        return json.dumps(
-            {"id": self.id, "title": self.title, "description": self.description}
-        )
+        return json.dumps(vars(self))
 
     @classmethod
     def from_json(cls, json):
-        json = json.loads(json)
-        return cls(id=json["id"], title=json["title"], description=json["description"])
+        return cls(**json.loads(json))
