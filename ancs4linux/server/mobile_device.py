@@ -36,6 +36,8 @@ class MobileDevice:
             return
 
         try:
+            # TODO: 3s is too long when we are not paired, but too short if
+            # user has to click.
             self.notification_source.StartNotify(timeout=3)
             self.data_source.StartNotify(timeout=3)
         except RuntimeError as e:
