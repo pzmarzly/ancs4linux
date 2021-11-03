@@ -1,6 +1,6 @@
 import click
 from dasbus.loop import EventLoop
-from dasbus.connection import SessionMessageBus, SystemMessageBus
+from dasbus.connection import SessionMessageBus
 from ancs4linux.server.advertising import prepare_for_advertising, enable_advertising
 from ancs4linux.server.server import Server
 from ancs4linux.server.mobile_scanner import MobileScanner

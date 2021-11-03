@@ -23,8 +23,11 @@ class MobileScanner:
         if "org.bluez.Device1" in services:
             device = path
             paired = services["org.bluez.Device1"]["Paired"].unpack()
+            connected = services["org.bluez.Device1"]["Connected"].unpack()
             self.devices[device] = self.devices.get(device) or MobileDevice(device)
             self.devices[device].set_paired(paired)
+            self.devices[device].set_connected(connected)
+            # TODO: connect to PropertiesChanged
             return
 
         if "org.bluez.GattCharacteristic1" in services:

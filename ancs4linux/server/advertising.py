@@ -5,7 +5,6 @@ from dasbus.server.interface import dbus_interface
 from dasbus.structure import DBusData
 from dasbus.typing import Bool, Byte, Str, UInt16, UInt32, ObjPath
 from dasbus.typing import Variant  # type: ignore # dynamic via PyGObject
-import random
 
 
 def array_of_bytes(array: List[int]) -> Variant:
@@ -70,30 +69,29 @@ class PairingAgent:
         pass
 
     def RequestPinCode(self, device: ObjPath) -> Str:
-        pin = random.randint(100000, 999999)
-        print(f"PIN: {pin}")
-        return str(pin)
+        raise NotImplementedError
 
     def DisplayPinCode(self, device: ObjPath, pincode: Str) -> None:
+        raise NotImplementedError
         # TODO: return error as in
         # https://github.com/elementary/switchboard-plug-bluetooth/blob/838b1ba728bed32945981e0d05ae34b7151cd466/src/Services/Agent.vala
-        print(f"PIN code: {pincode}.")
 
     def RequestPassKey(self, device: ObjPath) -> UInt32:
-        pin = random.randint(100000, 999999)
-        print(f"PIN: {pin}")
-        return UInt32(pin)
+        raise NotImplementedError
 
     def DisplayPasskey(self, device: ObjPath, passkey: UInt32, entered: UInt16) -> None:
-        print(f"Passkey: {passkey}. Entered: {entered}.")
+        raise NotImplementedError
 
     def RequestConfirmation(self, device: ObjPath, passkey: UInt32) -> None:
-        print(f"Accepting {device} with {passkey}.")
+        print(f"Proceed pairing with {device} if code is {passkey}.")
 
     def RequestAuthorization(self, device: ObjPath) -> None:
-        print(f"Authorizing {device}.")
+        raise NotImplementedError
 
     def AuthorizeService(self, device: ObjPath, uuid: Str) -> None:
+        # TODO: if uuid == "0000110d-0000-1000-8000-00805f9b34fb":
+        # We want to accept phone->PC A2DP.
+        # We don't want to accept volume control as it's a bit broken.
         print(f"Authorizing {device} for {uuid}.")
 
     def Cancel(self) -> None:
@@ -124,6 +122,8 @@ def enable_advertising(name: str):
     for path in get_all_hci():
         hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
         if not hci.Powered:
+            continue
+        if not hci.Address.startswith("08:71:90"):  # TODO: configurable
             continue
 
         def cb(call, path):
