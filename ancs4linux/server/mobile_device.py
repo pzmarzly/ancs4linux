@@ -36,9 +36,10 @@ class MobileDevice:
             return
 
         try:
-            # TODO: 3s is too long when we are not paired, but too short if
-            # user has to click.
-            self.notification_source.StartNotify(timeout=3)
-            self.data_source.StartNotify(timeout=3)
+            # This timeout has to be set, as unpaired device will ignore
+            # our request. It cannot be too low, as user may need to interact
+            # with a permission dialog.
+            self.notification_source.StartNotify(timeout=20)
+            self.data_source.StartNotify(timeout=20)
         except RuntimeError as e:
             print(f"Failed to start subscribe to notifications (is phone paired?): {e}")
