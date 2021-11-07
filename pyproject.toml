@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "ancs4linux"
-version = "0.1.0"
-description = ""
-authors = ["pzmarzly <pawo2500@gmail.com>"]
-license = "MIT"
+version = "1.0.0"
+description = "Control your iOS device from Linux desktop"
+authors = ["Paweł Zmarzły <pawo2500@gmail.com>"]
+license = "GPL-2.0-or-later"
+repository = "https://github.com/pzmarzly/ancs4linux"
 
 [tool.poetry.scripts]
 ancs4linux-server = 'ancs4linux.server.main:main'

@@ -86,6 +86,7 @@ class PairingAgent:
         print(f"Proceed pairing with {device} if code is {passkey}.")
 
     def RequestAuthorization(self, device: ObjPath) -> None:
+        print("RequestAuthorization")
         raise NotImplementedError
 
     def AuthorizeService(self, device: ObjPath, uuid: Str) -> None:
