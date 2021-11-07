@@ -12,7 +12,7 @@ def array_of_bytes(array: List[int]) -> Variant:
 
 
 @dbus_interface("org.bluez.LEAdvertisement1")
-class AdvertisementData(DBusData):  # TODO: remove DBusData
+class AdvertisementData:
     @property
     def Type(self) -> Str:
         return "peripheral"
