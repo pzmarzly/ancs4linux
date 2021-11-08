@@ -15,7 +15,7 @@ BLUEZ_GATT_CHARACTERISTIC = "org.bluez.GattCharacteristic1"
 
 
 class MobileScanner:
-    def __init__(self, server):
+    def __init__(self):
         self.proxy: Any = SystemMessageBus().get_proxy("org.bluez", "/")
         self.devices: Dict[str, MobileDevice] = {}
 

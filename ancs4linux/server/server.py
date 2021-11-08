@@ -1,22 +1,47 @@
-from dasbus.typing import Bool, Str
+from dasbus.typing import Str, UInt32
 from dasbus.server.interface import dbus_interface, dbus_signal
-from typing import cast, Any
-from ancs4linux.common.types import NewNotification
+from typing import Callable, List, cast, Any
+from ancs4linux.common.types import ShowNotificationData
+from ancs4linux.server.advertising import enable_advertising, get_all_hci_macs
+
+
+server_instances: List["Server"] = []
 
 
 @dbus_interface("ancs4linux.Server")
 class Server:
-    advertising_name = "ancs4linux"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        server_instances.append(self)
 
-    def SetAdvertisingEnabled(self, enabled: Bool) -> None:
-        pass
+    @staticmethod
+    def all_instances():
+        return server_instances
 
-    def SetAdvertisingName(self, name: Str) -> None:
-        self.advertising_name = name
+    @staticmethod
+    def broadcast(fn: Callable[["Server"], Any]):
+        for server in server_instances:
+            fn(server)
 
-    def send_new_notification(self, data: NewNotification) -> None:
-        cast(Any, self.NewNotification)(data.to_json())
+    def GetAllHci(self) -> List[Str]:
+        return get_all_hci_macs()
+
+    def EnableAdvertising(self, name: Str, hciMac: Str) -> None:
+        return enable_advertising(name, hciMac)
+
+    def DisableAdvertising(self, hciMac: Str) -> None:
+        pass  # TODO: implement
+
+    def show_notification(self, data: ShowNotificationData) -> None:
+        cast(Any, self.ShowNotification)(data.to_json())
 
     @dbus_signal
-    def NewNotification(self, json: Str) -> None:
+    def ShowNotification(self, json: Str) -> None:
+        pass
+
+    def dismiss_notification(self, id: UInt32) -> None:
+        cast(Any, self.DismissNotification)(id)
+
+    @dbus_signal
+    def DismissNotification(self, id: UInt32) -> None:
         pass

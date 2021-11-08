@@ -1,7 +1,10 @@
 import click
 from dasbus.loop import EventLoop
-from dasbus.connection import SessionMessageBus
-from ancs4linux.server.advertising import prepare_for_advertising, enable_advertising
+from dasbus.connection import SessionMessageBus, SystemMessageBus
+from ancs4linux.server.advertising import (
+    AdvertisementData,
+    PairingAgent,
+)
 from ancs4linux.server.server import Server
 from ancs4linux.server.mobile_scanner import MobileScanner
 
@@ -11,14 +14,10 @@ from ancs4linux.server.mobile_scanner import MobileScanner
 def main(dbus_name):
     loop = EventLoop()
 
-    server = Server()
-    SessionMessageBus().publish_object("/", server)
+    SessionMessageBus().publish_object("/", Server())
     SessionMessageBus().register_service(dbus_name)
+    SystemMessageBus().publish_object("/advertisement", AdvertisementData())
+    SystemMessageBus().publish_object("/agent", PairingAgent())
 
-    scanner = MobileScanner(server)
-    scanner.start_observing()
-
-    prepare_for_advertising()
-    enable_advertising("test")
-
+    MobileScanner().start_observing()
     loop.run()

@@ -1,8 +1,9 @@
 from typing import Any, Dict, List, cast
 from dasbus.connection import SystemMessageBus
 from dasbus.typing import Variant  # type: ignore # dynamic via PyGObject
+from ancs4linux.server.server import Server
+from ancs4linux.common.types import ShowNotificationData
 import struct
-from ancs4linux.server.notification import Notification
 
 
 class MobileDevice:
@@ -13,7 +14,6 @@ class MobileDevice:
         self.notification_source: Any = None
         self.control_point: Any = None
         self.data_source: Any = None
-        self.notifications: Dict[str, Notification] = {}
 
     def set_notification_source(self, path) -> None:
         self.notification_source = SystemMessageBus().get_proxy("org.bluez", path)
@@ -85,8 +85,7 @@ class MobileDevice:
             )
             self.control_point.WriteValue(get_details, {})
         else:
-            if id in self.notifications:
-                self.notifications[id].dismiss()
+            Server.broadcast(lambda s: s.dismiss_notification(id))
 
     def notification_change_details(
         self, interface: str, changes: Dict[str, Variant], invalidated: List[str]
@@ -103,7 +102,17 @@ class MobileDevice:
         body_size, msg = struct.unpack("<BH", msg[:3])[1], msg[3:]
         body_bytes, msg = msg[:body_size], msg[body_size:]
 
-        appID = appID_bytes.decode("utf8", errors="replace")
+        _appID = appID_bytes.decode("utf8", errors="replace")
         title = title_bytes.decode("utf8", errors="replace")
         body = body_bytes.decode("utf8", errors="replace")
-        self.notifications.get(id, Notification(id)).show(title, appID, body)
+        Server.broadcast(
+            lambda s: s.show_notification(
+                ShowNotificationData(
+                    device_address=self.path,
+                    device_name="TODO: fill",
+                    id=id,
+                    title=title,
+                    body=body,
+                )
+            )
+        )

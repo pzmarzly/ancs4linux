@@ -1,6 +1,6 @@
 from dasbus.connection import SessionMessageBus
 from dasbus.typing import Int32, UInt32
-from typing import Any, List
+from typing import Any
 
 
 class Notification:
@@ -11,14 +11,12 @@ class Notification:
             "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
         )
 
-    def show(self, title: str, appID: str, body: str):
-        actions: List[str] = []
-        timeout = Int32(-1)
+    def show(self, title: str, appID: str, body: str) -> None:
         self.host_id = self.notifications.Notify(
-            appID, UInt32(self.host_id), "", title, body, actions, [], timeout
+            appID, UInt32(self.host_id), "", title, body, [], [], Int32(-1)
         )
 
-    def dismiss(self):
+    def dismiss(self) -> None:
         if self.host_id != 0:
             self.notifications.CloseNotification(UInt32(self.host_id))
             self.host_id = 0

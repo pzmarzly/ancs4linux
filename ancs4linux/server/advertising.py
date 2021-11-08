@@ -99,13 +99,7 @@ class PairingAgent:
         pass
 
 
-def prepare_for_advertising():
-    bus = SystemMessageBus()
-    bus.publish_object("/advertisement", AdvertisementData())
-    bus.publish_object("/agent", PairingAgent())
-
-
-def get_all_hci():
+def get_all_hci_paths() -> List[str]:
     proxy: Any = SystemMessageBus().get_proxy("org.bluez", "/")
     return [
         path
@@ -114,17 +108,24 @@ def get_all_hci():
     ]
 
 
-def enable_advertising(name: str):
+def get_all_hci_macs() -> List[str]:
+    def get_mac(path: str) -> str:
+        hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
+        return hci.Address
+
+    return list(map(get_mac, get_all_hci_paths()))
+
+
+def enable_advertising(name: str, hciMac: str):
     agent_manager: Any = SystemMessageBus().get_proxy("org.bluez", "/org/bluez")
     agent_manager.RegisterAgent("/agent", "DisplayYesNo")
     agent_manager.RequestDefaultAgent("/agent")
 
-    # TODO: advertise on single hci
-    for path in get_all_hci():
+    for path in get_all_hci_paths():
         hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
-        if not hci.Powered:
+        if hci.Address != hciMac:
             continue
-        if not hci.Address.startswith("08:71:90"):  # TODO: configurable
+        if not hci.Powered:
             continue
 
         def cb(call, path):

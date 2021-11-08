@@ -3,12 +3,12 @@ import json
 
 
 @dataclass
-class NewNotification:
+class ShowNotificationData:
     device_address: str
     device_name: str
     id: int
     title: str
-    description: str
+    body: str
 
     def to_json(self):
         return json.dumps(vars(self))
