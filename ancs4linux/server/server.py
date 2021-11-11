@@ -2,7 +2,7 @@ from dasbus.typing import Str, UInt32
 from dasbus.server.interface import dbus_interface, dbus_signal
 from typing import Callable, List, cast, Any
 from ancs4linux.common.types import ShowNotificationData
-from ancs4linux.server.advertising import enable_advertising, get_all_hci_macs
+from ancs4linux.server.advertising import enable_advertising, get_all_hci_addresses
 
 
 server_instances: List["Server"] = []
@@ -24,12 +24,12 @@ class Server:
             fn(server)
 
     def GetAllHci(self) -> List[Str]:
-        return get_all_hci_macs()
+        return get_all_hci_addresses()
 
-    def EnableAdvertising(self, name: Str, hciMac: Str) -> None:
-        return enable_advertising(name, hciMac)
+    def EnableAdvertising(self, name: Str, hci_address: Str) -> None:
+        return enable_advertising(name, hci_address)
 
-    def DisableAdvertising(self, hciMac: Str) -> None:
+    def DisableAdvertising(self, hci_address: Str) -> None:
         pass  # TODO: implement
 
     def show_notification(self, data: ShowNotificationData) -> None:

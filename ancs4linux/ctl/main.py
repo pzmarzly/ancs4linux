@@ -22,16 +22,14 @@ def get_all_hci() -> None:
 
 @main.command()
 @click.option("--name", help="Name to advertise as", default="ancs4linux")
-@click.option(
-    "--hci-mac", help="MAC address of device to advertise on"
-)  # TODO: it's not MAC
-def enable_advertising(name: str, hci_mac: str) -> None:
+@click.option("--hci-address", help="address of device to advertise on")
+def enable_advertising(name: str, hci_address: str) -> None:
     """Enable advertising and pairing."""
-    server.EnableAdvertising(name, hci_mac)
+    server.EnableAdvertising(name, hci_address)
 
 
 @main.command()
-@click.option("--hci-mac", help="MAC address of device to advertise on")
-def disable_advertising(hci_mac: str) -> None:
+@click.option("--hci-address", help="address of device to advertise on")
+def disable_advertising(hci_address: str) -> None:
     """Disable advertising and pairing."""
-    server.DisableAdvertising(hci_mac)
+    server.DisableAdvertising(hci_address)

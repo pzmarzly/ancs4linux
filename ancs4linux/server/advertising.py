@@ -108,22 +108,22 @@ def get_all_hci_paths() -> List[str]:
     ]
 
 
-def get_all_hci_macs() -> List[str]:
-    def get_mac(path: str) -> str:
+def get_all_hci_addresses() -> List[str]:
+    def get_address(path: str) -> str:
         hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
         return hci.Address
 
-    return list(map(get_mac, get_all_hci_paths()))
+    return [get_address(path) for path in get_all_hci_paths()]
 
 
-def enable_advertising(name: str, hciMac: str):
+def enable_advertising(name: str, hci_address: str):
     agent_manager: Any = SystemMessageBus().get_proxy("org.bluez", "/org/bluez")
     agent_manager.RegisterAgent("/agent", "DisplayYesNo")
     agent_manager.RequestDefaultAgent("/agent")
 
     for path in get_all_hci_paths():
         hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
-        if hci.Address != hciMac:
+        if hci.Address != hci_address:
             continue
         if not hci.Powered:
             continue
