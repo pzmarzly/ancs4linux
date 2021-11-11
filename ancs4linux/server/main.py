@@ -20,4 +20,5 @@ def main(dbus_name):
     SystemMessageBus().publish_object("/agent", PairingAgent())
 
     MobileScanner().start_observing()
+    print("Observing devices...")
     loop.run()

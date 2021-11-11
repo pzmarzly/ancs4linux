@@ -1,0 +1,8 @@
+[Unit]
+Description=ancs4linux-desktop-integration - should run as user
+
+[Service]
+ExecStart=/usr/bin/ancs4linux-desktop-integration
+
+[Install]
+WantedBy=default.target

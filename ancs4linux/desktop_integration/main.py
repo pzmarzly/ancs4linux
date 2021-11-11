@@ -27,4 +27,5 @@ def main(dbus_name: str) -> None:
     server: Any = bus.get_proxy(dbus_name, "/")
     server.ShowNotification.connect(new_notification)
     server.DismissNotification.connect(new_notification)
+    print("Listening to notifications...")
     loop.run()
