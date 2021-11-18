@@ -1,5 +1,6 @@
+from dataclasses import dataclass
 from dasbus.connection import SystemMessageBus
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from dasbus.error import DBusError
 from dasbus.server.interface import dbus_interface
 from dasbus.structure import DBusData
@@ -99,43 +100,87 @@ class PairingAgent:
         pass
 
 
-def get_all_hci_paths() -> List[str]:
-    proxy: Any = SystemMessageBus().get_proxy("org.bluez", "/")
-    return [
-        path
-        for path, services in proxy.GetManagedObjects().items()
-        if "org.bluez.LEAdvertisingManager1" in services
-    ]
+@dataclass
+class HciState:
+    name: str
+    powered: bool
+    discoverable: bool
+    pairable: bool
 
+    @classmethod
+    def advertising(cls, name: str) -> "HciState":
+        return cls(name=name, powered=True, discoverable=True, pairable=True)
 
-def get_all_hci_addresses() -> List[str]:
-    def get_address(path: str) -> str:
-        hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
-        return hci.Address
-
-    return [get_address(path) for path in get_all_hci_paths()]
-
-
-def enable_advertising(name: str, hci_address: str):
-    agent_manager: Any = SystemMessageBus().get_proxy("org.bluez", "/org/bluez")
-    agent_manager.RegisterAgent("/agent", "DisplayYesNo")
-    agent_manager.RequestDefaultAgent("/agent")
-
-    for path in get_all_hci_paths():
-        hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
-        if hci.Address != hci_address:
-            continue
-        if not hci.Powered:
-            continue
-
-        def cb(call, path):
-            try:
-                call()
-            except DBusError as e:
-                print(f"Failed to start advertising on {path}: {e}")
-
-        hci.RegisterAdvertisement(
-            "/advertisement", {}, callback=cb, callback_args=[path]
+    @classmethod
+    def save(cls, hci: Any) -> "HciState":
+        return cls(
+            name=hci.Name,
+            powered=hci.Powered,
+            discoverable=hci.Discoverable,
+            pairable=hci.Pairable,
         )
-        hci.Discoverable = True
-        hci.Pairable = True
+
+    def restore_on(self, hci: Any) -> None:
+        hci.Powered = self.powered
+        hci.Name = self.name
+        hci.Pairable = self.pairable
+        hci.Discoverable = self.discoverable
+
+
+class AdvertisingManager:
+    def __init__(self):
+        self.active_advertisements: Dict[str, HciState] = {}
+        SystemMessageBus().publish_object("/advertisement", AdvertisementData())
+        SystemMessageBus().publish_object("/pairing_agent", PairingAgent())
+
+    def get_all_hci(self) -> Dict[str, Dict[str, Dict[str, Any]]]:
+        proxy: Any = SystemMessageBus().get_proxy("org.bluez", "/")
+        return {
+            path: services
+            for path, services in proxy.GetManagedObjects().items()
+            if "org.bluez.Adapter1" in services
+            if "org.bluez.LEAdvertisingManager1" in services
+        }
+
+    def get_all_hci_addresses(self) -> List[str]:
+        return [
+            hci["org.bluez.Adapter1"]["Address"]
+            for path, hci in self.get_all_hci().items()
+        ]
+
+    def get_hci_path(self, hci_address: str) -> Optional[str]:
+        for path, hci in self.get_all_hci().items():
+            if hci["org.bluez.Adapter1"]["Address"] == hci_address:
+                return path
+        return None
+
+    def enable_advertising(self, hci_address: str, name: str) -> None:
+        path = self.get_hci_path(hci_address)
+        if path is None:
+            raise Exception(f"Unknown hci address {hci_address}")
+
+        if len(self.active_advertisements) == 0:
+            agent_manager: Any = SystemMessageBus().get_proxy("org.bluez", "/org/bluez")
+            agent_manager.RegisterAgent("/pairing_agent", "DisplayYesNo")
+            agent_manager.RequestDefaultAgent("/pairing_agent")
+
+        hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
+        self.active_advertisements[hci_address] = HciState.save(hci)
+        HciState.advertising(name).restore_on(hci)
+        hci.RegisterAdvertisement("/advertisement", {})
+
+    def disable_advertising(self, hci_address: str) -> None:
+        if hci_address not in self.active_advertisements:
+            raise Exception(f"No advertisement found for {hci_address}")
+
+        original_state = self.active_advertisements[hci_address]
+        del self.active_advertisements[hci_address]
+        path = self.get_hci_path(hci_address)
+        if path is not None:
+            hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
+            hci.UnregisterAdvertisement("/advertisement")
+            original_state.restore_on(hci)
+
+        if len(self.active_advertisements) == 0:
+            agent_manager: Any = SystemMessageBus().get_proxy("org.bluez", "/org/bluez")
+            agent_manager.UnregisterAgent("/pairing_agent")

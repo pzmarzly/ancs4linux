@@ -1,9 +1,11 @@
-from typing import Any
+from typing import Any, cast
 import click
 import json
 from dasbus.connection import SessionMessageBus
 
-server: Any = None
+from ancs4linux.server.server import Server
+
+server: Server
 
 
 @click.group()
@@ -11,7 +13,7 @@ server: Any = None
 def main(dbus_name: str) -> None:
     """Issue commands to ancs4linux server running in background."""
     global server
-    server = SessionMessageBus().get_proxy(dbus_name, "/")
+    server = cast(Any, SessionMessageBus().get_proxy(dbus_name, "/"))
 
 
 @main.command()
@@ -21,11 +23,11 @@ def get_all_hci() -> None:
 
 
 @main.command()
-@click.option("--name", help="Name to advertise as", default="ancs4linux")
 @click.option("--hci-address", help="address of device to advertise on")
-def enable_advertising(name: str, hci_address: str) -> None:
+@click.option("--name", help="Name to advertise as", default="ancs4linux")
+def enable_advertising(hci_address: str, name: str) -> None:
     """Enable advertising and pairing."""
-    server.EnableAdvertising(name, hci_address)
+    server.EnableAdvertising(hci_address, name)
 
 
 @main.command()

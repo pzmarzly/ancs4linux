@@ -7,7 +7,8 @@ import struct
 
 
 class MobileDevice:
-    def __init__(self, path: str):
+    def __init__(self, path: str, server: Server):
+        self.server = server
         self.path = path
         self.paired = False
         self.connected = False
@@ -85,7 +86,7 @@ class MobileDevice:
             )
             self.control_point.WriteValue(get_details, {})
         else:
-            Server.broadcast(lambda s: s.dismiss_notification(id))
+            self.server.dismiss_notification(id)
 
     def notification_change_details(
         self, interface: str, changes: Dict[str, Variant], invalidated: List[str]
@@ -105,14 +106,12 @@ class MobileDevice:
         _appID = appID_bytes.decode("utf8", errors="replace")
         title = title_bytes.decode("utf8", errors="replace")
         body = body_bytes.decode("utf8", errors="replace")
-        Server.broadcast(
-            lambda s: s.show_notification(
-                ShowNotificationData(
-                    device_address=self.path,
-                    device_name="TODO: fill",
-                    id=id,
-                    title=title,
-                    body=body,
-                )
+        self.server.show_notification(
+            ShowNotificationData(
+                device_address=self.path,
+                device_name="TODO: fill",
+                id=id,
+                title=title,
+                body=body,
             )
         )

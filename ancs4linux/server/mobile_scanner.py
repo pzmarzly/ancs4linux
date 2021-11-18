@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 from dasbus.typing import Variant  # type: ignore # dynamic via PyGObject
 from functools import partial
 from ancs4linux.server.mobile_device import MobileDevice
+from ancs4linux.server.server import Server
 
 ANCS_SERVICE = "7905f431-b5ce-4e99-a40f-4b1e122d00d0"
 NOTIFICATION_SOURCE_CHAR = "9fbf120d-6301-42d9-8c58-25e699a21dbd"
@@ -15,7 +16,8 @@ BLUEZ_GATT_CHARACTERISTIC = "org.bluez.GattCharacteristic1"
 
 
 class MobileScanner:
-    def __init__(self):
+    def __init__(self, server: Server):
+        self.server = server
         self.proxy: Any = SystemMessageBus().get_proxy("org.bluez", "/")
         self.devices: Dict[str, MobileDevice] = {}
 
@@ -36,7 +38,7 @@ class MobileScanner:
             if uuid not in ANCS_CHARS:
                 return
             device = "/".join(path.split("/")[:-2])
-            self.devices[device] = self.devices.get(device) or MobileDevice(device)
+            self.devices.setdefault(device, MobileDevice(device, self.server))
             if uuid == NOTIFICATION_SOURCE_CHAR:
                 self.devices[device].set_notification_source(path)
             elif uuid == CONTROL_POINT_CHAR:
@@ -53,7 +55,7 @@ class MobileScanner:
         invalidated: List[str],
     ) -> None:
         if interface == "org.bluez.Device1":
-            self.devices[device] = self.devices.get(device) or MobileDevice(device)
+            self.devices.setdefault(device, MobileDevice(device, self.server))
             if "Paired" in changes:
                 self.devices[device].set_paired(changes["Paired"].unpack())
             if "Connected" in changes:
