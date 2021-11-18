@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, cast
-from dasbus.connection import SystemMessageBus
-from dasbus.typing import Variant  # type: ignore # dynamic via PyGObject
+from ancs4linux.common.dbus import SystemBus, Variant
 from ancs4linux.server.server import Server
 from ancs4linux.common.types import ShowNotificationData
 import struct
@@ -17,15 +16,15 @@ class MobileDevice:
         self.data_source: Any = None
 
     def set_notification_source(self, path) -> None:
-        self.notification_source = SystemMessageBus().get_proxy("org.bluez", path)
+        self.notification_source = SystemBus().get_proxy("org.bluez", path)
         self.try_subscribe()
 
     def set_control_point(self, path) -> None:
-        self.control_point = SystemMessageBus().get_proxy("org.bluez", path)
+        self.control_point = SystemBus().get_proxy("org.bluez", path)
         self.try_subscribe()
 
     def set_data_source(self, path) -> None:
-        self.data_source = SystemMessageBus().get_proxy("org.bluez", path)
+        self.data_source = SystemBus().get_proxy("org.bluez", path)
         self.try_subscribe()
 
     def set_paired(self, paired: bool) -> None:

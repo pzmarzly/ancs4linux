@@ -1,5 +1,4 @@
-from dasbus.connection import SessionMessageBus
-from dasbus.typing import Int32, UInt32
+from ancs4linux.common.dbus import SessionBus, UInt32, Int32
 from typing import Any
 
 
@@ -7,7 +6,7 @@ class Notification:
     def __init__(self, id: int):
         self.device_id = id
         self.host_id = 0
-        self.notifications: Any = SessionMessageBus().get_proxy(
+        self.notifications: Any = SessionBus().get_proxy(
             "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
         )
 

@@ -1,28 +1,34 @@
 from typing import Any, cast
 import click
 import json
-from dasbus.connection import SessionMessageBus
-
+from ancs4linux.common.dbus import SessionBus, DBusError
 from ancs4linux.server.server import Server
 
 server: Server
 
 
+def main() -> None:
+    try:
+        commands()
+    except DBusError as e:
+        print(f"Server returned an error: {e}")
+
+
 @click.group()
 @click.option("--dbus-name", help="Server service name", default="ancs4linux.Server")
-def main(dbus_name: str) -> None:
+def commands(dbus_name: str) -> None:
     """Issue commands to ancs4linux server running in background."""
     global server
-    server = cast(Any, SessionMessageBus().get_proxy(dbus_name, "/"))
+    server = cast(Any, SessionBus().get_proxy(dbus_name, "/"))
 
 
-@main.command()
+@commands.command()
 def get_all_hci() -> None:
     """Get all HCI supporting Bluetooth Low Energy."""
     print(json.dumps(server.GetAllHci()))
 
 
-@main.command()
+@commands.command()
 @click.option("--hci-address", help="address of device to advertise on")
 @click.option("--name", help="Name to advertise as", default="ancs4linux")
 def enable_advertising(hci_address: str, name: str) -> None:
@@ -30,7 +36,7 @@ def enable_advertising(hci_address: str, name: str) -> None:
     server.EnableAdvertising(hci_address, name)
 
 
-@main.command()
+@commands.command()
 @click.option("--hci-address", help="address of device to advertise on")
 def disable_advertising(hci_address: str) -> None:
     """Disable advertising and pairing."""

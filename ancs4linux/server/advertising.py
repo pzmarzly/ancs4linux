@@ -1,11 +1,17 @@
 from dataclasses import dataclass
-from dasbus.connection import SystemMessageBus
 from typing import Any, Dict, List, Optional
-from dasbus.error import DBusError
-from dasbus.server.interface import dbus_interface
-from dasbus.structure import DBusData
-from dasbus.typing import Bool, Byte, Str, UInt16, UInt32, ObjPath
-from dasbus.typing import Variant  # type: ignore # dynamic via PyGObject
+from ancs4linux.common.dbus import (
+    PairingRejected,
+    Variant,
+    Str,
+    Bool,
+    UInt16,
+    UInt32,
+    Byte,
+    ObjPath,
+    SystemBus,
+    dbus_interface,
+)
 
 
 def array_of_bytes(array: List[int]) -> Variant:
@@ -70,31 +76,29 @@ class PairingAgent:
         pass
 
     def RequestPinCode(self, device: ObjPath) -> Str:
-        raise NotImplementedError
+        raise PairingRejected
 
     def DisplayPinCode(self, device: ObjPath, pincode: Str) -> None:
-        raise NotImplementedError
-        # TODO: return error as in
-        # https://github.com/elementary/switchboard-plug-bluetooth/blob/838b1ba728bed32945981e0d05ae34b7151cd466/src/Services/Agent.vala
+        raise PairingRejected
 
     def RequestPassKey(self, device: ObjPath) -> UInt32:
-        raise NotImplementedError
+        raise PairingRejected
 
     def DisplayPasskey(self, device: ObjPath, passkey: UInt32, entered: UInt16) -> None:
-        raise NotImplementedError
+        raise PairingRejected
 
     def RequestConfirmation(self, device: ObjPath, passkey: UInt32) -> None:
         print(f"Proceed pairing with {device} if code is {passkey}.")
 
     def RequestAuthorization(self, device: ObjPath) -> None:
-        print("RequestAuthorization")
-        raise NotImplementedError
+        raise PairingRejected
 
     def AuthorizeService(self, device: ObjPath, uuid: Str) -> None:
-        # TODO: if uuid == "0000110d-0000-1000-8000-00805f9b34fb":
-        # We want to accept phone->PC A2DP.
+        if uuid == "0000110d-0000-1000-8000-00805f9b34fb":
+            print(f"Authorizing {device} for audio redirection.")
         # We don't want to accept volume control as it's a bit broken.
-        print(f"Authorizing {device} for {uuid}.")
+        # Reject everything else.
+        raise PairingRejected
 
     def Cancel(self) -> None:
         pass
@@ -114,7 +118,7 @@ class HciState:
     @classmethod
     def save(cls, hci: Any) -> "HciState":
         return cls(
-            name=hci.Name,
+            name=hci.Alias,
             powered=hci.Powered,
             discoverable=hci.Discoverable,
             pairable=hci.Pairable,
@@ -122,19 +126,20 @@ class HciState:
 
     def restore_on(self, hci: Any) -> None:
         hci.Powered = self.powered
-        hci.Name = self.name
-        hci.Pairable = self.pairable
-        hci.Discoverable = self.discoverable
+        hci.Alias = self.name
+        if self.powered:
+            hci.Pairable = self.pairable
+            hci.Discoverable = self.discoverable
 
 
 class AdvertisingManager:
     def __init__(self):
         self.active_advertisements: Dict[str, HciState] = {}
-        SystemMessageBus().publish_object("/advertisement", AdvertisementData())
-        SystemMessageBus().publish_object("/pairing_agent", PairingAgent())
+        SystemBus().publish_object("/advertisement", AdvertisementData())
+        SystemBus().publish_object("/pairing_agent", PairingAgent())
 
     def get_all_hci(self) -> Dict[str, Dict[str, Dict[str, Any]]]:
-        proxy: Any = SystemMessageBus().get_proxy("org.bluez", "/")
+        proxy: Any = SystemBus().get_proxy("org.bluez", "/")
         return {
             path: services
             for path, services in proxy.GetManagedObjects().items()
@@ -144,13 +149,13 @@ class AdvertisingManager:
 
     def get_all_hci_addresses(self) -> List[str]:
         return [
-            hci["org.bluez.Adapter1"]["Address"]
+            hci["org.bluez.Adapter1"]["Address"].unpack()
             for path, hci in self.get_all_hci().items()
         ]
 
     def get_hci_path(self, hci_address: str) -> Optional[str]:
         for path, hci in self.get_all_hci().items():
-            if hci["org.bluez.Adapter1"]["Address"] == hci_address:
+            if hci["org.bluez.Adapter1"]["Address"].unpack() == hci_address:
                 return path
         return None
 
@@ -160,11 +165,11 @@ class AdvertisingManager:
             raise Exception(f"Unknown hci address {hci_address}")
 
         if len(self.active_advertisements) == 0:
-            agent_manager: Any = SystemMessageBus().get_proxy("org.bluez", "/org/bluez")
+            agent_manager: Any = SystemBus().get_proxy("org.bluez", "/org/bluez")
             agent_manager.RegisterAgent("/pairing_agent", "DisplayYesNo")
             agent_manager.RequestDefaultAgent("/pairing_agent")
 
-        hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
+        hci: Any = SystemBus().get_proxy("org.bluez", path)
         self.active_advertisements[hci_address] = HciState.save(hci)
         HciState.advertising(name).restore_on(hci)
         hci.RegisterAdvertisement("/advertisement", {})
@@ -177,10 +182,10 @@ class AdvertisingManager:
         del self.active_advertisements[hci_address]
         path = self.get_hci_path(hci_address)
         if path is not None:
-            hci: Any = SystemMessageBus().get_proxy("org.bluez", path)
+            hci: Any = SystemBus().get_proxy("org.bluez", path)
             hci.UnregisterAdvertisement("/advertisement")
             original_state.restore_on(hci)
 
         if len(self.active_advertisements) == 0:
-            agent_manager: Any = SystemMessageBus().get_proxy("org.bluez", "/org/bluez")
+            agent_manager: Any = SystemBus().get_proxy("org.bluez", "/org/bluez")
             agent_manager.UnregisterAgent("/pairing_agent")

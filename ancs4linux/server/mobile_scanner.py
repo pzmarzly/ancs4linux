@@ -1,7 +1,6 @@
-from dasbus.connection import SystemMessageBus
 from typing import Any, Dict, List
-from dasbus.typing import Variant  # type: ignore # dynamic via PyGObject
 from functools import partial
+from ancs4linux.common.dbus import SystemBus, Variant
 from ancs4linux.server.mobile_device import MobileDevice
 from ancs4linux.server.server import Server
 
@@ -18,7 +17,7 @@ BLUEZ_GATT_CHARACTERISTIC = "org.bluez.GattCharacteristic1"
 class MobileScanner:
     def __init__(self, server: Server):
         self.server = server
-        self.proxy: Any = SystemMessageBus().get_proxy("org.bluez", "/")
+        self.proxy: Any = SystemBus().get_proxy("org.bluez", "/")
         self.devices: Dict[str, MobileDevice] = {}
 
     def start_observing(self):
@@ -29,7 +28,7 @@ class MobileScanner:
     def process_object(self, path, services) -> None:
         if BLUEZ_DEVICE in services:
             self.process_property(path, BLUEZ_DEVICE, services[BLUEZ_DEVICE], [])
-            proxy: Any = SystemMessageBus().get_proxy("org.bluez", "/")
+            proxy: Any = SystemBus().get_proxy("org.bluez", "/")
             proxy.PropertiesChanged.connect(partial(self.process_property, path))
             return
 
