@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Optional, cast
 from ancs4linux.common.dbus import SystemBus, Variant
 from ancs4linux.server.server import Server
 from ancs4linux.common.types import ShowNotificationData
@@ -11,19 +11,20 @@ class MobileDevice:
         self.path = path
         self.paired = False
         self.connected = False
+        self.name: Optional[str] = None
         self.notification_source: Any = None
         self.control_point: Any = None
         self.data_source: Any = None
 
-    def set_notification_source(self, path) -> None:
+    def set_notification_source(self, path: str) -> None:
         self.notification_source = SystemBus().get_proxy("org.bluez", path)
         self.try_subscribe()
 
-    def set_control_point(self, path) -> None:
+    def set_control_point(self, path: str) -> None:
         self.control_point = SystemBus().get_proxy("org.bluez", path)
         self.try_subscribe()
 
-    def set_data_source(self, path) -> None:
+    def set_data_source(self, path: str) -> None:
         self.data_source = SystemBus().get_proxy("org.bluez", path)
         self.try_subscribe()
 
@@ -35,10 +36,15 @@ class MobileDevice:
         self.connected = connected
         self.try_subscribe()
 
+    def set_name(self, name: str) -> None:
+        self.name = name
+        self.try_subscribe()
+
     def try_subscribe(self) -> None:
         if not (
             self.paired
             and self.connected
+            and self.name
             and self.notification_source
             and self.control_point
             and self.data_source
@@ -48,7 +54,7 @@ class MobileDevice:
         print("Asking for notifications...")
 
         try:
-            # TODO: blocking here (e.g. due to device not responding) can lock our program.
+            # FIXME: blocking here (e.g. due to device not responding) can lock our program.
             # Timeouts (timeout=1000 [ms]) do not work.
             self.notification_source.StartNotify()
             self.data_source.StartNotify()
@@ -105,10 +111,11 @@ class MobileDevice:
         _appID = appID_bytes.decode("utf8", errors="replace")
         title = title_bytes.decode("utf8", errors="replace")
         body = body_bytes.decode("utf8", errors="replace")
+        assert self.path and self.name
         self.server.show_notification(
             ShowNotificationData(
                 device_address=self.path,
-                device_name="TODO: fill",
+                device_name=self.name,
                 id=id,
                 title=title,
                 body=body,
