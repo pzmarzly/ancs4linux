@@ -14,10 +14,10 @@ class Server:
         return self.advertising_manager.get_all_hci_addresses()
 
     def EnableAdvertising(self, hci_address: Str, name: Str) -> None:
-        return self.advertising_manager.enable_advertising(hci_address, name)
+        self.advertising_manager.enable_advertising(hci_address, name)
 
     def DisableAdvertising(self, hci_address: Str) -> None:
-        return self.advertising_manager.disable_advertising(hci_address)
+        self.advertising_manager.disable_advertising(hci_address)
 
     def show_notification(self, data: ShowNotificationData) -> None:
         cast(Any, self.ShowNotification)(data.to_json())

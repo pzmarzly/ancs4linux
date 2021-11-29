@@ -3,6 +3,7 @@ from ancs4linux.common.dbus import SystemBus, Variant
 from ancs4linux.server.server import Server
 from ancs4linux.common.types import ShowNotificationData
 import struct
+import time
 
 
 class MobileDevice:
@@ -61,7 +62,11 @@ class MobileDevice:
         except Exception as e:
             print(f"Failed to start subscribe to notifications (is phone paired?): {e}")
             if hasattr(e, "dbus_name"):
-                print(f"Original error: {cast(Any, e).dbus_name}")
+                name = cast(Any, e).dbus_name
+                print(f"Original error: {name}")
+            print("Will retry in 10 seconds...")
+            # TODO: retry
+            return
 
         self.notification_source.PropertiesChanged.connect(self.notification_change)
         self.data_source.PropertiesChanged.connect(self.notification_change_details)

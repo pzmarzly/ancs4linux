@@ -1,8 +1,6 @@
 [Unit]
-Description=ancs4linux-desktop-integration - should run as user
+Description=ancs4linux Desktop Integration daemon (should run as user)
 
 [Service]
-ExecStart=/usr/bin/ancs4linux-desktop-integration
-
-[Install]
-WantedBy=default.target
+Type=simple
+ExecStart=/usr/local/bin/ancs4linux-desktop-integration

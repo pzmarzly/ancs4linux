@@ -10,9 +10,9 @@ class ShowNotificationData:
     title: str
     body: str
 
-    def to_json(self):
+    def to_json(self) -> str:
         return json.dumps(vars(self))
 
     @classmethod
-    def from_json(cls, json):
-        return cls(**json.loads(json))
+    def from_json(cls, data: str) -> "ShowNotificationData":
+        return cls(**json.loads(data))

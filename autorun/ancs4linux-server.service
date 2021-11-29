@@ -1,8 +1,7 @@
 [Unit]
-Description=ancs4linux-server
+Description=ancs4linux Server daemon
 
 [Service]
-ExecStart=/usr/bin/ancs4linux-server
-
-[Install]
-WantedBy=multi-user.target
+Type=dbus
+BusName=ancs4linux.Server
+ExecStart=/usr/local/bin/ancs4linux-server

@@ -21,14 +21,17 @@ class MobileScanner:
         self.devices: Dict[str, MobileDevice] = {}
 
     def start_observing(self):
+        self.scan_tree()
+        self.proxy.InterfacesAdded.connect(lambda _path, _services: self.scan_tree)
+
+    def scan_tree(self):
         for path, services in self.proxy.GetManagedObjects().items():
             self.process_object(path, services)
-        self.proxy.InterfacesAdded.connect(self.process_object)
 
     def process_object(self, path, services) -> None:
         if BLUEZ_DEVICE in services:
             self.process_property(path, BLUEZ_DEVICE, services[BLUEZ_DEVICE], [])
-            proxy: Any = SystemBus().get_proxy("org.bluez", "/")
+            proxy: Any = SystemBus().get_proxy("org.bluez", path)
             proxy.PropertiesChanged.connect(partial(self.process_property, path))
             return
 
@@ -53,10 +56,12 @@ class MobileScanner:
         changes: Dict[str, Variant],
         invalidated: List[str],
     ) -> None:
-        if interface == "org.bluez.Device1":
+        if interface == BLUEZ_DEVICE:
             self.devices.setdefault(device, MobileDevice(device, self.server))
             if "Paired" in changes:
                 self.devices[device].set_paired(changes["Paired"].unpack())
             if "Connected" in changes:
                 self.devices[device].set_connected(changes["Connected"].unpack())
+            if "Alias" in changes:
+                self.devices[device].set_name(changes["Alias"].unpack())
             return
