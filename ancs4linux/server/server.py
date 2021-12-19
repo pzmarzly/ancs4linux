@@ -20,7 +20,7 @@ class Server:
         self.advertising_manager.disable_advertising(hci_address)
 
     def show_notification(self, data: ShowNotificationData) -> None:
-        cast(Any, self.ShowNotification)(data.to_json())
+        cast(Any, self.ShowNotification)(data.json())
 
     @dbus_signal
     def ShowNotification(self, json: Str) -> None:

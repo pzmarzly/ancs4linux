@@ -8,7 +8,7 @@ notifications: Dict[int, Notification] = {}
 
 
 def new_notification(json: str) -> None:
-    data = ShowNotificationData.from_json(json)
+    data = ShowNotificationData.parse_raw(json)
     notifications[data.id] = notifications.get(data.id, Notification(data.id))
     notifications[data.id].show(data.title, data.device_name, data.body)
 
