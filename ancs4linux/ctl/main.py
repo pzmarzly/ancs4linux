@@ -1,7 +1,7 @@
 from typing import Any, cast
 import click
 import json
-from ancs4linux.common.dbus import SessionBus, DBusError
+from ancs4linux.common.dbus import SystemBus, DBusError
 from ancs4linux.server.server import Server
 
 server: Server
@@ -19,7 +19,7 @@ def main() -> None:
 def commands(dbus_name: str) -> None:
     """Issue commands to ancs4linux server running in background."""
     global server
-    server = cast(Any, SessionBus().get_proxy(dbus_name, "/"))
+    server = cast(Any, SystemBus().get_proxy(dbus_name, "/"))
 
 
 @commands.command()

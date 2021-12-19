@@ -1,7 +1,7 @@
 from typing import Any, Dict
 import click
 from ancs4linux.common.types import ShowNotificationData
-from ancs4linux.common.dbus import SessionBus, EventLoop
+from ancs4linux.common.dbus import SystemBus, EventLoop
 from ancs4linux.desktop_integration.notification import Notification
 
 notifications: Dict[int, Notification] = {}
@@ -22,7 +22,7 @@ def dismiss_notification(id: int) -> None:
 @click.option("--dbus-name", help="Server service name", default="ancs4linux.Server")
 def main(dbus_name: str) -> None:
     loop = EventLoop()
-    server: Any = SessionBus().get_proxy(dbus_name, "/")
+    server: Any = SystemBus().get_proxy(dbus_name, "/")
     server.ShowNotification.connect(new_notification)
     server.DismissNotification.connect(new_notification)
     print("Listening to notifications...")

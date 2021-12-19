@@ -1,7 +1,11 @@
 [Unit]
 Description=ancs4linux Server daemon
+Requires=bluetooth.service
 
 [Service]
 Type=dbus
 BusName=ancs4linux.Server
 ExecStart=/usr/local/bin/ancs4linux-server
+
+[Install]
+WantedBy=default.target

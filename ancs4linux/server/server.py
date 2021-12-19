@@ -1,5 +1,5 @@
 from typing import List, cast, Any
-from ancs4linux.common.dbus import dbus_interface, dbus_signal, Str, UInt32, SessionBus
+from ancs4linux.common.dbus import dbus_interface, dbus_signal, Str, UInt32, SystemBus
 from ancs4linux.common.types import ShowNotificationData
 from ancs4linux.server.advertising import AdvertisingManager
 
@@ -8,7 +8,7 @@ from ancs4linux.server.advertising import AdvertisingManager
 class Server:
     def __init__(self, advertising_manager: AdvertisingManager):
         self.advertising_manager = advertising_manager
-        SessionBus().publish_object("/", self)
+        SystemBus().publish_object("/", self)
 
     def GetAllHci(self) -> List[Str]:
         return self.advertising_manager.get_all_hci_addresses()

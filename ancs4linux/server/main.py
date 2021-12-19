@@ -1,5 +1,5 @@
 import click
-from ancs4linux.common.dbus import EventLoop, SessionBus
+from ancs4linux.common.dbus import EventLoop, SystemBus
 from ancs4linux.server.advertising import (
     AdvertisingManager,
 )
@@ -17,5 +17,5 @@ def main(dbus_name):
     MobileScanner(server).start_observing()
 
     print("Observing devices...")
-    SessionBus().register_service(dbus_name)
+    SystemBus().register_service(dbus_name)
     loop.run()
