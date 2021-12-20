@@ -1,6 +1,6 @@
 import click
 from ancs4linux.common.dbus import EventLoop, SystemBus
-from ancs4linux.observer.server import ObserverAPI
+from ancs4linux.observer.server import ObserverServer
 from ancs4linux.observer.mobile_scanner import MobileScanner
 
 
@@ -9,7 +9,7 @@ from ancs4linux.observer.mobile_scanner import MobileScanner
 def main(dbus_name):
     loop = EventLoop()
 
-    server = ObserverAPI()
+    server = ObserverServer()
     MobileScanner(server).start_observing()
 
     print("Observing devices")

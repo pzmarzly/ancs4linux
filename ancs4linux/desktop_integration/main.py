@@ -1,5 +1,6 @@
-from typing import Any, Dict
+from typing import Dict, cast
 import click
+from ancs4linux.common.apis import ObserverAPI, NotificationAPI
 from ancs4linux.common.types import ShowNotificationData
 from ancs4linux.common.dbus import SessionBus, SystemBus, Int32, UInt32, EventLoop
 
@@ -10,18 +11,18 @@ class Notification:
         self.host_id = 0
 
     def show(self, title: str, appID: str, body: str) -> None:
-        self.host_id = notifications_api.Notify(
+        self.host_id = notification_api.Notify(
             appID, UInt32(self.host_id), "", title, body, [], [], Int32(-1)
         )
 
     def dismiss(self) -> None:
         if self.host_id != 0:
-            notifications_api.CloseNotification(UInt32(self.host_id))
+            notification_api.CloseNotification(UInt32(self.host_id))
             self.host_id = 0
 
 
-notifications_api: Any
-server_api: Any
+notification_api: NotificationAPI
+observer_api: ObserverAPI
 notifications: Dict[int, Notification] = {}
 
 
@@ -43,14 +44,17 @@ def dismiss_notification(id: int) -> None:
 def main(observer_dbus: str) -> None:
     loop = EventLoop()
 
-    global server_api, notifications_api
-    notifications_api = SessionBus().get_proxy(
-        "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
+    global observer_api, notification_api
+    notification_api = cast(
+        NotificationAPI,
+        SessionBus().get_proxy(
+            "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
+        ),
     )
-    server_api = SystemBus().get_proxy(observer_dbus, "/")
+    observer_api = cast(ObserverAPI, SystemBus().get_proxy(observer_dbus, "/"))
 
-    server_api.ShowNotification.connect(new_notification)
-    server_api.DismissNotification.connect(new_notification)
+    observer_api.ShowNotification.connect(new_notification)
+    observer_api.DismissNotification.connect(new_notification)
 
     print("Listening to notifications...")
     loop.run()

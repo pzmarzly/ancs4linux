@@ -1,10 +1,11 @@
 from typing import cast, Any
+from ancs4linux.common.apis import ObserverAPI
 from ancs4linux.common.dbus import dbus_interface, dbus_signal, Str, UInt32, SystemBus
 from ancs4linux.common.types import ShowNotificationData
 
 
 @dbus_interface("ancs4linux.Observer")
-class ObserverAPI:
+class ObserverServer(ObserverAPI):
     def __init__(self):
         SystemBus().publish_object("/", self)
 

@@ -1,7 +1,7 @@
 import click
 from ancs4linux.common.dbus import EventLoop, SystemBus
 from ancs4linux.advertising.manager import AdvertisingManager
-from ancs4linux.advertising.server import AdvertisingAPI
+from ancs4linux.advertising.server import AdvertisingServer
 
 
 @click.command()
@@ -12,7 +12,7 @@ def main(dbus_name):
     loop = EventLoop()
 
     advertising_manager = AdvertisingManager()
-    AdvertisingAPI(advertising_manager)
+    AdvertisingServer(advertising_manager)
     SystemBus().register_service(dbus_name)
 
     print("Ready to advertise")

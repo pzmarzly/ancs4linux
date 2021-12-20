@@ -1,12 +1,12 @@
 from typing import Any, Dict, List, Optional, cast
 from ancs4linux.common.dbus import SystemBus, Variant
-from ancs4linux.observer.server import ObserverAPI
+from ancs4linux.observer.server import ObserverServer
 from ancs4linux.common.types import ShowNotificationData
 import struct
 
 
 class MobileDevice:
-    def __init__(self, path: str, server: ObserverAPI):
+    def __init__(self, path: str, server: ObserverServer):
         self.server = server
         self.path = path
         self.paired = False

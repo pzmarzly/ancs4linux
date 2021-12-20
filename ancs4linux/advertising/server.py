@@ -1,10 +1,11 @@
 from typing import List, cast, Any
+from ancs4linux.common.apis import AdvertisingAPI
 from ancs4linux.common.dbus import dbus_interface, dbus_signal, Str, SystemBus
 from ancs4linux.advertising.manager import AdvertisingManager
 
 
 @dbus_interface("ancs4linux.Advertising")
-class AdvertisingAPI:
+class AdvertisingServer(AdvertisingAPI):
     def __init__(self, advertising_manager: AdvertisingManager):
         self.advertising_manager = advertising_manager
         SystemBus().publish_object("/", self)

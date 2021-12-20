@@ -1,8 +1,8 @@
-from typing import Any, cast
+from typing import cast
 import click
 import json
 from ancs4linux.common.dbus import SystemBus, DBusError
-from ancs4linux.advertising.server import AdvertisingAPI
+from ancs4linux.common.apis import AdvertisingAPI
 
 advertising_api: AdvertisingAPI
 

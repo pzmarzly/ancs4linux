@@ -2,7 +2,7 @@ from typing import Any, Dict, List
 from functools import partial
 from ancs4linux.common.dbus import SystemBus, Variant
 from ancs4linux.observer.mobile_device import MobileDevice
-from ancs4linux.observer.server import ObserverAPI
+from ancs4linux.observer.server import ObserverServer
 
 ANCS_SERVICE = "7905f431-b5ce-4e99-a40f-4b1e122d00d0"
 NOTIFICATION_SOURCE_CHAR = "9fbf120d-6301-42d9-8c58-25e699a21dbd"
@@ -15,7 +15,7 @@ BLUEZ_GATT_CHARACTERISTIC = "org.bluez.GattCharacteristic1"
 
 
 class MobileScanner:
-    def __init__(self, server: ObserverAPI):
+    def __init__(self, server: ObserverServer):
         self.server = server
         self.proxy: Any = SystemBus().get_proxy("org.bluez", "/")
         self.devices: Dict[str, MobileDevice] = {}
