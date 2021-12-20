@@ -1,13 +1,12 @@
 from typing import Any, Dict, List, Optional, cast
 from ancs4linux.common.dbus import SystemBus, Variant
-from ancs4linux.server.server import Server
+from ancs4linux.observer.server import ObserverAPI
 from ancs4linux.common.types import ShowNotificationData
 import struct
-import time
 
 
 class MobileDevice:
-    def __init__(self, path: str, server: Server):
+    def __init__(self, path: str, server: ObserverAPI):
         self.server = server
         self.path = path
         self.paired = False
@@ -103,8 +102,10 @@ class MobileDevice:
     ) -> None:
         if interface != "org.bluez.GattCharacteristic1" or "Value" not in changes:
             return
-
         msg = bytearray(changes["Value"])
+        if len(msg) < 14:
+            return
+
         id, msg = struct.unpack("<BI", msg[:5])[1], msg[5:]
         appID_size, msg = struct.unpack("<BH", msg[:3])[1], msg[3:]
         appID_bytes, msg = msg[:appID_size], msg[appID_size:]

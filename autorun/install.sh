@@ -9,8 +9,10 @@ fi
 
 cd "$(dirname "$0")"
 
-install -m 644 ancs4linux-server.service /usr/lib/systemd/system/ancs4linux-server.service
-install -m 644 ancs4linux-server.xml /etc/dbus-1/system.d/ancs4linux-server.conf
+install -m 644 ancs4linux-observer.service /usr/lib/systemd/system/ancs4linux-observer.service
+install -m 644 ancs4linux-observer.xml /etc/dbus-1/system.d/ancs4linux-observer.conf
+install -m 644 ancs4linux-advertising.service /usr/lib/systemd/system/ancs4linux-advertising.service
+install -m 644 ancs4linux-advertising.xml /etc/dbus-1/system.d/ancs4linux-advertising.conf
 install -m 644 ancs4linux-desktop-integration.service /usr/lib/systemd/user/ancs4linux-desktop-integration.service
 
 set +e
@@ -20,5 +22,6 @@ cd ..
 pip3 install .
 
 systemctl daemon-reload
-systemctl enable ancs4linux-server.service
+systemctl enable ancs4linux-observer.service
+systemctl enable ancs4linux-advertising.service
 systemctl --global enable ancs4linux-desktop-integration.service

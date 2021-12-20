@@ -1,0 +1,11 @@
+[Unit]
+Description=ancs4linux Advertising daemon
+Requires=bluetooth.service
+
+[Service]
+Type=dbus
+BusName=ancs4linux.Advertising
+ExecStart=/usr/local/bin/ancs4linux-advertising
+
+[Install]
+WantedBy=default.target

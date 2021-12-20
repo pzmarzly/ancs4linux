@@ -1,0 +1,11 @@
+[Unit]
+Description=ancs4linux Observer daemon
+Requires=bluetooth.service
+
+[Service]
+Type=dbus
+BusName=ancs4linux.Observer
+ExecStart=/usr/local/bin/ancs4linux-observer
+
+[Install]
+WantedBy=default.target
