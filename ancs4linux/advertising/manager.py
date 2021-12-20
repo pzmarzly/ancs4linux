@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
+from ancs4linux.advertising.server import AdvertisingServer
 from ancs4linux.common.dbus import (
     PairingRejected,
     Variant,
@@ -72,6 +73,9 @@ class AdvertisementData:
 
 @dbus_interface("org.bluez.Agent1")
 class PairingAgent:
+    def __init__(self, server: AdvertisingServer):
+        self.server = server
+
     def Release(self) -> None:
         pass
 
@@ -88,16 +92,12 @@ class PairingAgent:
         raise PairingRejected
 
     def RequestConfirmation(self, device: ObjPath, passkey: UInt32) -> None:
-        print(f"Proceed pairing with {device} if code is {passkey}.")
+        self.server.pairing_code(str(int(passkey)))
 
     def RequestAuthorization(self, device: ObjPath) -> None:
         raise PairingRejected
 
     def AuthorizeService(self, device: ObjPath, uuid: Str) -> None:
-        if uuid == "0000110d-0000-1000-8000-00805f9b34fb":
-            print(f"Authorizing {device} for audio redirection.")
-        # We don't want to accept volume control as it's a bit broken.
-        # Reject everything else.
         raise PairingRejected
 
     def Cancel(self) -> None:
@@ -135,8 +135,10 @@ class HciState:
 class AdvertisingManager:
     def __init__(self):
         self.active_advertisements: Dict[str, HciState] = {}
+
+    def register(self, server: AdvertisingServer) -> None:
         SystemBus().publish_object("/advertisement", AdvertisementData())
-        SystemBus().publish_object("/pairing_agent", PairingAgent())
+        SystemBus().publish_object("/pairing_agent", PairingAgent(server))
 
     def get_all_hci(self) -> Dict[str, Dict[str, Dict[str, Any]]]:
         proxy: Any = SystemBus().get_proxy("org.bluez", "/")

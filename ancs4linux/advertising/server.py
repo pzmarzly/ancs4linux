@@ -8,6 +8,8 @@ from ancs4linux.advertising.manager import AdvertisingManager
 class AdvertisingServer(AdvertisingAPI):
     def __init__(self, advertising_manager: AdvertisingManager):
         self.advertising_manager = advertising_manager
+
+    def register(self) -> None:
         SystemBus().publish_object("/", self)
 
     def GetAllHci(self) -> List[Str]:

@@ -10,8 +10,10 @@ def main(dbus_name):
     loop = EventLoop()
 
     server = ObserverServer()
-    MobileScanner(server).start_observing()
+    scanner = MobileScanner(server)
+    server.register()
+    SystemBus().register_service(dbus_name)
 
     print("Observing devices")
-    SystemBus().register_service(dbus_name)
+    scanner.start_observing()
     loop.run()

@@ -1,6 +1,6 @@
 from typing import Dict, cast
 import click
-from ancs4linux.common.apis import ObserverAPI, NotificationAPI
+from ancs4linux.common.apis import AdvertisingAPI, ObserverAPI, NotificationAPI
 from ancs4linux.common.types import ShowNotificationData
 from ancs4linux.common.dbus import SessionBus, SystemBus, Int32, UInt32, EventLoop
 
@@ -22,8 +22,22 @@ class Notification:
 
 
 notification_api: NotificationAPI
+advertising_api: AdvertisingAPI
 observer_api: ObserverAPI
 notifications: Dict[int, Notification] = {}
+
+
+def pairing_code(pin: str) -> None:
+    notification_api.Notify(
+        "ancs4linux",
+        UInt32(0),
+        "",
+        "Pairing initiated",
+        f"Pair if PIN is {pin}",
+        [],
+        [],
+        Int32(30),
+    )
 
 
 def new_notification(json: str) -> None:
@@ -41,18 +55,25 @@ def dismiss_notification(id: int) -> None:
 @click.option(
     "--observer-dbus", help="Observer service path", default="ancs4linux.Observer"
 )
-def main(observer_dbus: str) -> None:
+@click.option(
+    "--advertising-dbus",
+    help="Advertising service path",
+    default="ancs4linux.Advertising",
+)
+def main(observer_dbus: str, advertising_dbus: str) -> None:
     loop = EventLoop()
 
-    global observer_api, notification_api
+    global observer_api, advertising_api, notification_api
     notification_api = cast(
         NotificationAPI,
         SessionBus().get_proxy(
             "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
         ),
     )
+    advertising_api = cast(AdvertisingAPI, SystemBus().get_proxy(advertising_dbus, "/"))
     observer_api = cast(ObserverAPI, SystemBus().get_proxy(observer_dbus, "/"))
 
+    advertising_api.PairingCode.connect(pairing_code)
     observer_api.ShowNotification.connect(new_notification)
     observer_api.DismissNotification.connect(new_notification)
 

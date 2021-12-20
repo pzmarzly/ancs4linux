@@ -6,7 +6,7 @@ from ancs4linux.common.types import ShowNotificationData
 
 @dbus_interface("ancs4linux.Observer")
 class ObserverServer(ObserverAPI):
-    def __init__(self):
+    def register(self) -> None:
         SystemBus().publish_object("/", self)
 
     def show_notification(self, data: ShowNotificationData) -> None:

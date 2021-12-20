@@ -12,7 +12,9 @@ def main(dbus_name):
     loop = EventLoop()
 
     advertising_manager = AdvertisingManager()
-    AdvertisingServer(advertising_manager)
+    server = AdvertisingServer(advertising_manager)
+    advertising_manager.register(server)
+    server.register()
     SystemBus().register_service(dbus_name)
 
     print("Ready to advertise")
