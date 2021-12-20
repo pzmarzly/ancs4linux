@@ -29,7 +29,7 @@ def get_all_hci() -> None:
 
 
 @commands.command()
-@click.option("--hci-address", help="address of device to advertise on")
+@click.option("--hci-address", help="address of device to advertise on", required=True)
 @click.option("--name", help="Name to advertise as", default="ancs4linux")
 def enable_advertising(hci_address: str, name: str) -> None:
     """Enable advertising and pairing."""
@@ -37,7 +37,7 @@ def enable_advertising(hci_address: str, name: str) -> None:
 
 
 @commands.command()
-@click.option("--hci-address", help="address of device to advertise on")
+@click.option("--hci-address", help="address of device to advertise on", required=True)
 def disable_advertising(hci_address: str) -> None:
     """Disable advertising and pairing."""
     server.DisableAdvertising(hci_address)
