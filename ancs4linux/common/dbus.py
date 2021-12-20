@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Type, cast
 from dasbus.loop import EventLoop
 from dasbus.connection import SystemMessageBus, SessionMessageBus
 from dasbus.server.interface import dbus_interface, dbus_signal
@@ -11,7 +11,7 @@ EventLoop = EventLoop
 dbus_interface, dbus_signal = dbus_interface, dbus_signal
 Bool, Byte, UInt16, Int16, UInt32, Int32 = Bool, Byte, UInt16, Int16, UInt32, Int32
 Str, ObjPath = Str, ObjPath
-Variant = cast(Any, Variant)
+Variant = cast(Type, Variant)
 
 error_mapper = ErrorMapper()
 DBusError = DBusError

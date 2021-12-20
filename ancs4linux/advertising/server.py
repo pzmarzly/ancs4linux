@@ -1,4 +1,4 @@
-from typing import List, cast, Any
+from typing import Callable, List, cast
 from ancs4linux.common.apis import AdvertisingAPI
 from ancs4linux.common.dbus import dbus_interface, dbus_signal, Str, SystemBus
 from ancs4linux.advertising.manager import AdvertisingManager
@@ -20,7 +20,7 @@ class AdvertisingServer(AdvertisingAPI):
         self.advertising_manager.disable_advertising(hci_address)
 
     def pairing_code(self, pin: str) -> None:
-        cast(Any, self.PairingCode)(pin)
+        cast(Callable, self.PairingCode)(pin)
 
     @dbus_signal
     def PairingCode(self, pin: Str) -> None:
