@@ -1,15 +1,12 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
-from ancs4linux.common.apis import AdvertisingAPI
+from ancs4linux.advertising.pairing import PairingManager
 from ancs4linux.common.dbus import (
-    PairingRejected,
     Variant,
     Str,
     Bool,
     UInt16,
-    UInt32,
     Byte,
-    ObjPath,
     SystemBus,
     dbus_interface,
 )
@@ -71,39 +68,6 @@ class AdvertisementData:
         pass
 
 
-@dbus_interface("org.bluez.Agent1")
-class PairingAgent:
-    def __init__(self, server: AdvertisingAPI):
-        self.server = server
-
-    def Release(self) -> None:
-        pass
-
-    def RequestPinCode(self, device: ObjPath) -> Str:
-        raise PairingRejected
-
-    def DisplayPinCode(self, device: ObjPath, pincode: Str) -> None:
-        raise PairingRejected
-
-    def RequestPassKey(self, device: ObjPath) -> UInt32:
-        raise PairingRejected
-
-    def DisplayPasskey(self, device: ObjPath, passkey: UInt32, entered: UInt16) -> None:
-        raise PairingRejected
-
-    def RequestConfirmation(self, device: ObjPath, passkey: UInt32) -> None:
-        self.server.pairing_code(str(int(passkey)))
-
-    def RequestAuthorization(self, device: ObjPath) -> None:
-        raise PairingRejected
-
-    def AuthorizeService(self, device: ObjPath, uuid: Str) -> None:
-        raise PairingRejected
-
-    def Cancel(self) -> None:
-        pass
-
-
 @dataclass
 class HciState:
     name: str
@@ -133,12 +97,12 @@ class HciState:
 
 
 class AdvertisingManager:
-    def __init__(self):
+    def __init__(self, pairing_manager: PairingManager):
         self.active_advertisements: Dict[str, HciState] = {}
+        self.pairing_manager = pairing_manager
 
-    def register(self, server: AdvertisingAPI) -> None:
+    def register(self) -> None:
         SystemBus().publish_object("/advertisement", AdvertisementData())
-        SystemBus().publish_object("/pairing_agent", PairingAgent(server))
 
     def get_all_hci(self) -> Dict[str, Dict[str, Dict[str, Any]]]:
         proxy: Any = SystemBus().get_proxy("org.bluez", "/")
@@ -170,10 +134,8 @@ class AdvertisingManager:
         if path is None:
             raise Exception(f"Unknown hci address {hci_address}")
 
-        if len(self.active_advertisements) == 0:
-            agent_manager: Any = SystemBus().get_proxy("org.bluez", "/org/bluez")
-            agent_manager.RegisterAgent("/pairing_agent", "DisplayYesNo")
-            agent_manager.RequestDefaultAgent("/pairing_agent")
+        if not self.pairing_manager.enabled and len(self.active_advertisements) == 0:
+            self.pairing_manager.enable_automatically()
 
         hci: Any = SystemBus().get_proxy("org.bluez", path)
         self.active_advertisements[hci_address] = HciState.save(hci)
@@ -193,5 +155,4 @@ class AdvertisingManager:
             original_state.restore_on(hci)
 
         if len(self.active_advertisements) == 0:
-            agent_manager: Any = SystemBus().get_proxy("org.bluez", "/org/bluez")
-            agent_manager.UnregisterAgent("/pairing_agent")
+            self.pairing_manager.disable_if_enabled_automatically()

@@ -47,6 +47,14 @@ class AdvertisingAPI(ABC):
     def DisableAdvertising(self, hci_address: Str) -> None:
         pass
 
+    @abstractmethod
+    def EnablePairing(self) -> None:
+        pass
+
+    @abstractmethod
+    def DisablePairing(self) -> None:
+        pass
+
     def pairing_code(self, pin: str) -> None:
         cast(Callable, self.PairingCode)(pin)
 
