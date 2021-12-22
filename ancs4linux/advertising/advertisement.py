@@ -13,11 +13,13 @@ from ancs4linux.common.dbus import (
 
 
 def array_of_bytes(array: List[int]) -> Variant:
-    return Variant("ay", array)
+    return Variant("ay", [Byte(i) for i in array])
 
 
 @dbus_interface("org.bluez.LEAdvertisement1")
 class AdvertisementData:
+    """Simple advertisement. IDs were taken randomly."""
+
     @property
     def Type(self) -> Str:
         return "peripheral"
@@ -28,7 +30,7 @@ class AdvertisementData:
 
     @property
     def ServiceUUIDs(self) -> List[Str]:
-        return ["180D", "180F"]
+        return []
 
     @ServiceUUIDs.setter
     def ServiceUUIDs(self, value: List[Str]) -> None:
@@ -44,11 +46,7 @@ class AdvertisementData:
 
     @property
     def ManufacturerData(self) -> Dict[UInt16, Variant]:
-        return {
-            UInt16(0xFFFF): array_of_bytes(
-                [Byte(0x00), Byte(0x00), Byte(0x00), Byte(0x01)]
-            )
-        }
+        return {UInt16(0xFFFF): array_of_bytes([0x50, 0xB0, 0x13, 0xF0])}
 
     @ManufacturerData.setter
     def ManufacturerData(self, value: Dict[UInt16, Variant]) -> None:
@@ -56,9 +54,7 @@ class AdvertisementData:
 
     @property
     def ServiceData(self) -> Dict[Str, Variant]:
-        return {
-            "9999": array_of_bytes([Byte(0x00), Byte(0x00), Byte(0x00), Byte(0x01)])
-        }
+        return {"9999": array_of_bytes([0x9E, 0x85, 0x39, 0x96])}
 
     @ServiceData.setter
     def ServiceData(self, value: Dict[Str, Variant]) -> None:
