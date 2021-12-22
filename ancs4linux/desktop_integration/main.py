@@ -64,14 +64,9 @@ def main(observer_dbus: str, advertising_dbus: str) -> None:
     loop = EventLoop()
 
     global observer_api, advertising_api, notification_api
-    notification_api = cast(
-        NotificationAPI,
-        SessionBus().get_proxy(
-            "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
-        ),
-    )
-    advertising_api = cast(AdvertisingAPI, SystemBus().get_proxy(advertising_dbus, "/"))
-    observer_api = cast(ObserverAPI, SystemBus().get_proxy(observer_dbus, "/"))
+    notification_api = NotificationAPI.connect()
+    advertising_api = AdvertisingAPI.connect(advertising_dbus)
+    observer_api = ObserverAPI.connect(observer_dbus)
 
     advertising_api.PairingCode.connect(pairing_code)
     observer_api.ShowNotification.connect(new_notification)

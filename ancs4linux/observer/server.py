@@ -6,18 +6,9 @@ from ancs4linux.common.types import ShowNotificationData
 
 @dbus_interface("ancs4linux.Observer")
 class ObserverServer(ObserverAPI):
-    def register(self) -> None:
-        SystemBus().publish_object("/", self)
-
-    def show_notification(self, data: ShowNotificationData) -> None:
-        cast(Callable, self.ShowNotification)(data.json())
-
     @dbus_signal
     def ShowNotification(self, json: Str) -> None:
         pass
-
-    def dismiss_notification(self, id: UInt32) -> None:
-        cast(Callable, self.DismissNotification)(id)
 
     @dbus_signal
     def DismissNotification(self, id: UInt32) -> None:

@@ -1,7 +1,6 @@
-from typing import cast
 import click
 import json
-from ancs4linux.common.dbus import SystemBus, DBusError
+from ancs4linux.common.dbus import DBusError
 from ancs4linux.common.apis import AdvertisingAPI
 
 advertising_api: AdvertisingAPI
@@ -20,10 +19,10 @@ def main() -> None:
     help="Advertising service path",
     default="ancs4linux.Advertising",
 )
-def commands(dbus_name: str) -> None:
+def commands(advertising_dbus: str) -> None:
     """Issue commands to ancs4linux server running in background."""
     global advertising_api
-    advertising_api = cast(AdvertisingAPI, SystemBus().get_proxy(dbus_name, "/"))
+    advertising_api = AdvertisingAPI.connect(advertising_dbus)
 
 
 @commands.command()

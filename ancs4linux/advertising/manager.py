@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
-from ancs4linux.advertising.server import AdvertisingServer
+from ancs4linux.common.apis import AdvertisingAPI
 from ancs4linux.common.dbus import (
     PairingRejected,
     Variant,
@@ -73,7 +73,7 @@ class AdvertisementData:
 
 @dbus_interface("org.bluez.Agent1")
 class PairingAgent:
-    def __init__(self, server: AdvertisingServer):
+    def __init__(self, server: AdvertisingAPI):
         self.server = server
 
     def Release(self) -> None:
@@ -136,7 +136,7 @@ class AdvertisingManager:
     def __init__(self):
         self.active_advertisements: Dict[str, HciState] = {}
 
-    def register(self, server: AdvertisingServer) -> None:
+    def register(self, server: AdvertisingAPI) -> None:
         SystemBus().publish_object("/advertisement", AdvertisementData())
         SystemBus().publish_object("/pairing_agent", PairingAgent(server))
 
