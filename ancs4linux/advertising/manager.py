@@ -162,6 +162,10 @@ class AdvertisingManager:
         return None
 
     def enable_advertising(self, hci_address: str, name: str) -> None:
+        if hci_address in self.active_advertisements:
+            # We were already advertising, but maybe something went wrong.
+            self.disable_advertising(hci_address)
+
         path = self.get_hci_path(hci_address)
         if path is None:
             raise Exception(f"Unknown hci address {hci_address}")
