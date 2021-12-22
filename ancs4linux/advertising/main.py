@@ -22,5 +22,5 @@ def main(
     server.register()
     SystemBus().register_service(advertising_dbus)
 
-    print("Ready to advertise")
+    print("Ready to advertise...")
     loop.run()
