@@ -1,8 +1,7 @@
 from typing import Any, Callable, Dict, List, Optional, cast
 from ancs4linux.common.dbus import SystemBus, Variant
-from ancs4linux.common.apis import ObserverAPI
+from ancs4linux.common.apis import ShowNotificationData, ObserverAPI
 from ancs4linux.common.task_restarter import TaskRestarter
-from ancs4linux.common.types import ShowNotificationData
 import struct
 
 

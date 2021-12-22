@@ -1,7 +1,11 @@
 from typing import Dict
 import typer
-from ancs4linux.common.apis import AdvertisingAPI, ObserverAPI, NotificationAPI
-from ancs4linux.common.types import ShowNotificationData
+from ancs4linux.common.apis import (
+    AdvertisingAPI,
+    ObserverAPI,
+    NotificationAPI,
+    ShowNotificationData,
+)
 from ancs4linux.common.dbus import Int32, UInt32, EventLoop
 
 notification_api: NotificationAPI

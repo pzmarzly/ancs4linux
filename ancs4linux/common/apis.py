@@ -1,7 +1,15 @@
 from abc import ABC, abstractmethod
 from typing import Callable, List, cast
 from ancs4linux.common.dbus import SessionBus, SystemBus, Str, UInt32, Int32, Variant
-from ancs4linux.common.types import ShowNotificationData
+from pydantic import BaseModel
+
+
+class ShowNotificationData(BaseModel):
+    device_address: str
+    device_name: str
+    id: int
+    title: str
+    body: str
 
 
 class ObserverAPI(ABC):
