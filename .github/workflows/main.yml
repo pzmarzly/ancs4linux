@@ -17,18 +17,22 @@ jobs:
         pip3 install poetry
         poetry config virtualenvs.in-project true
     - run: poetry install
+    - name: black
+      run: |
+        source .venv/bin/activate
+        black --check ancs4linux
+    - name: autoflake
+      run: |
+        source .venv/bin/activate
+        autoflake --check --remove-unused-variables --remove-all-unused-imports -r ancs4linux
+    - name: isort
+      run: |
+        source .venv/bin/activate
+        isort --check ancs4linux
     - name: MyPy
       run: |
         source .venv/bin/activate
         mypy --namespace-packages -p ancs4linux
-    - name: black
-      run: |
-        source .venv/bin/activate
-        black --check .
-    - name: isort
-      run: |
-        source .venv/bin/activate
-        isort --check .
 
   run:
     runs-on: ubuntu-latest

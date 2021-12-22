@@ -1,5 +1,5 @@
 from ancs4linux.common.apis import ObserverAPI
-from ancs4linux.common.dbus import Str, SystemBus, UInt32, dbus_interface, dbus_signal
+from ancs4linux.common.dbus import Str, UInt32, dbus_interface, dbus_signal
 
 
 @dbus_interface("ancs4linux.Observer")
