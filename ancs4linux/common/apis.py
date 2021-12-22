@@ -11,6 +11,7 @@ Signal = Any
 class ShowNotificationData(BaseModel):
     device_address: str
     device_name: str
+    appID: str
     id: int
     title: str
     body: str

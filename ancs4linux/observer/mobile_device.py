@@ -67,8 +67,8 @@ class MobileDevice:
             120,
             1,
             self.try_asking,
-            lambda: print("Asking for notifications: success!"),
-            lambda: print("Failed to subscribe to notifications"),
+            lambda: print("Asking for notifications: success."),
+            lambda: print("Failed to subscribe to notifications."),
         ).try_running_bg()
 
     def try_asking(self) -> bool:
@@ -133,7 +133,7 @@ class MobileDevice:
         body_size, msg = struct.unpack("<BH", msg[:3])[1], msg[3:]
         body_bytes, msg = msg[:body_size], msg[body_size:]
 
-        _appID = appID_bytes.decode("utf8", errors="replace")
+        appID = appID_bytes.decode("utf8", errors="replace")
         title = title_bytes.decode("utf8", errors="replace")
         body = body_bytes.decode("utf8", errors="replace")
         assert self.path and self.name
@@ -141,6 +141,7 @@ class MobileDevice:
             ShowNotificationData(
                 device_address=self.path,
                 device_name=self.name,
+                appID=appID,
                 id=id,
                 title=title,
                 body=body,
