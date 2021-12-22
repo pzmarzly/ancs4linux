@@ -4,7 +4,10 @@ from ancs4linux.common.dbus import EventLoop, SystemBus
 from ancs4linux.advertising.advertisement import AdvertisingManager
 from ancs4linux.advertising.server import AdvertisingServer
 
+app = typer.Typer()
 
+
+@app.command()
 def main(
     advertising_dbus: str = typer.Option("ancs4linux.Advertising", help="Service path")
 ) -> None:
@@ -20,7 +23,3 @@ def main(
 
     print("Ready to advertise")
     loop.run()
-
-
-def cli() -> None:
-    typer.run(main)

@@ -8,6 +8,7 @@ from ancs4linux.common.apis import (
 )
 from ancs4linux.common.dbus import Int32, UInt32, EventLoop
 
+app = typer.Typer()
 notification_api: NotificationAPI
 advertising_api: AdvertisingAPI
 observer_api: ObserverAPI
@@ -62,6 +63,7 @@ def dismiss_notification(id: int) -> None:
         notifications[id].dismiss()
 
 
+@app.command()
 def main(
     observer_dbus: str = typer.Option(
         "ancs4linux.Observer", help="Observer service path"
@@ -87,7 +89,3 @@ def main(
 
     print("Listening to notifications...")
     loop.run()
-
-
-def cli() -> None:
-    typer.run(main)

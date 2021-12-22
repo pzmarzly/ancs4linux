@@ -38,7 +38,3 @@ def main(
     """Issue commands to ancs4linux servers running in background."""
     global advertising_api
     advertising_api = AdvertisingAPI.connect(advertising_dbus)
-
-
-def cli() -> None:
-    app()
