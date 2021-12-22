@@ -6,6 +6,29 @@ advertising_api: AdvertisingAPI
 app = typer.Typer()
 
 
+@app.command()
+def get_all_hci() -> None:
+    """Get all HCI supporting Bluetooth Low Energy."""
+    print(json.dumps(advertising_api.GetAllHci()))
+
+
+@app.command()
+def enable_advertising(
+    hci_address: str = typer.Option(..., help="Address of device to advertise on"),
+    name: str = typer.Option("ancs4linux", help="Name to advertise on"),
+) -> None:
+    """Enable advertising and pairing."""
+    advertising_api.EnableAdvertising(hci_address, name)
+
+
+@app.command()
+def disable_advertising(
+    hci_address: str = typer.Option(..., help="Address of device to advertise on"),
+) -> None:
+    """Disable advertising and pairing."""
+    advertising_api.DisableAdvertising(hci_address)
+
+
 @app.callback()
 def main(
     advertising_dbus: str = typer.Option(
@@ -18,27 +41,4 @@ def main(
 
 
 def cli() -> None:
-    typer.run(main)
-
-
-@app.command()
-def get_all_hci() -> None:
-    """Get all HCI supporting Bluetooth Low Energy."""
-    print(json.dumps(advertising_api.GetAllHci()))
-
-
-@app.command()
-def enable_advertising(
-    hci_address: str = typer.Option(..., help="Address of device to advertise on"),
-    name: str = typer.Option("ancs4linux", "Name to advertise on"),
-) -> None:
-    """Enable advertising and pairing."""
-    advertising_api.EnableAdvertising(hci_address, name)
-
-
-@app.command()
-def disable_advertising(
-    hci_address: str = typer.Option(..., help="Address of device to advertise on"),
-) -> None:
-    """Disable advertising and pairing."""
-    advertising_api.DisableAdvertising(hci_address)
+    app()
