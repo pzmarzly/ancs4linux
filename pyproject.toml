@@ -7,17 +7,17 @@ license = "GPL-2.0-or-later"
 repository = "https://github.com/pzmarzly/ancs4linux"
 
 [tool.poetry.scripts]
-ancs4linux-advertising = 'ancs4linux.advertising.main:main'
-ancs4linux-desktop-integration = 'ancs4linux.desktop_integration.main:main'
-ancs4linux-ctl = 'ancs4linux.ctl.main:main'
-ancs4linux-observer = 'ancs4linux.observer.main:main'
+ancs4linux-advertising = 'ancs4linux.advertising.main:cli'
+ancs4linux-desktop-integration = 'ancs4linux.desktop_integration.main:cli'
+ancs4linux-ctl = 'ancs4linux.ctl.main:cli'
+ancs4linux-observer = 'ancs4linux.observer.main:cli'
 
 [tool.poetry.dependencies]
 python = "^3.7"
-click = "^8.0.3"
 dasbus = "^1.6"
 PyGObject = "^3.42.0"
 pydantic = "^1.8.2"
+typer = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.910"

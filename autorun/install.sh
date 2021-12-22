@@ -22,7 +22,6 @@ cd ..
 pip3 install .
 
 systemctl daemon-reload
-systemctl --global daemon-reload
 
 systemctl enable ancs4linux-observer.service
 systemctl enable ancs4linux-advertising.service
@@ -30,3 +29,7 @@ systemctl --global enable ancs4linux-desktop-integration.service
 
 systemctl restart ancs4linux-observer.service
 systemctl restart ancs4linux-advertising.service
+
+# Run as user:
+# systemctl --user daemon-reload
+# systemctl --user restart ancs4linux-desktop-integration.service

@@ -1,12 +1,12 @@
-import click
+import typer
 from ancs4linux.common.dbus import EventLoop, SystemBus
 from ancs4linux.observer.server import ObserverServer
 from ancs4linux.observer.mobile_scanner import MobileScanner
 
 
-@click.command()
-@click.option("--observer-dbus", help="Service path", default="ancs4linux.Observer")
-def main(observer_dbus: str) -> None:
+def main(
+    observer_dbus: str = typer.Option("ancs4linux.Observer", help="Service path")
+) -> None:
     loop = EventLoop()
 
     server = ObserverServer()
@@ -17,3 +17,7 @@ def main(observer_dbus: str) -> None:
     print("Observing devices")
     scanner.start_observing()
     loop.run()
+
+
+def cli() -> None:
+    typer.run(main)

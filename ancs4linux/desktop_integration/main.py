@@ -1,8 +1,14 @@
-from typing import Dict, cast
-import click
+from typing import Dict
+import typer
 from ancs4linux.common.apis import AdvertisingAPI, ObserverAPI, NotificationAPI
 from ancs4linux.common.types import ShowNotificationData
-from ancs4linux.common.dbus import SessionBus, SystemBus, Int32, UInt32, EventLoop
+from ancs4linux.common.dbus import Int32, UInt32, EventLoop
+
+notification_api: NotificationAPI
+advertising_api: AdvertisingAPI
+observer_api: ObserverAPI
+notification_timeout: int
+notifications: Dict[int, "Notification"] = {}
 
 
 class Notification:
@@ -12,19 +18,20 @@ class Notification:
 
     def show(self, title: str, appID: str, body: str) -> None:
         self.host_id = notification_api.Notify(
-            appID, UInt32(self.host_id), "", title, body, [], [], Int32(-1)
+            appID,
+            UInt32(self.host_id),
+            "",
+            title,
+            body,
+            [],
+            [],
+            Int32(notification_timeout),
         )
 
     def dismiss(self) -> None:
         if self.host_id != 0:
             notification_api.CloseNotification(UInt32(self.host_id))
             self.host_id = 0
-
-
-notification_api: NotificationAPI
-advertising_api: AdvertisingAPI
-observer_api: ObserverAPI
-notifications: Dict[int, Notification] = {}
 
 
 def pairing_code(pin: str) -> None:
@@ -36,7 +43,7 @@ def pairing_code(pin: str) -> None:
         f"Pair if PIN is {pin}",
         [],
         [],
-        Int32(30),
+        Int32(notification_timeout),
     )
 
 
@@ -51,17 +58,19 @@ def dismiss_notification(id: int) -> None:
         notifications[id].dismiss()
 
 
-@click.command()
-@click.option(
-    "--observer-dbus", help="Observer service path", default="ancs4linux.Observer"
-)
-@click.option(
-    "--advertising-dbus",
-    help="Advertising service path",
-    default="ancs4linux.Advertising",
-)
-def main(observer_dbus: str, advertising_dbus: str) -> None:
+def main(
+    observer_dbus: str = typer.Option(
+        "ancs4linux.Observer", help="Observer service path"
+    ),
+    advertising_dbus: str = typer.Option(
+        "ancs4linux.Advertising", help="Advertising service path"
+    ),
+    notification_ttl: int = typer.Option(30, help="How long to show notifications for"),
+) -> None:
     loop = EventLoop()
+
+    global notification_timeout
+    notification_timeout = notification_ttl
 
     global observer_api, advertising_api, notification_api
     notification_api = NotificationAPI.connect()
@@ -74,3 +83,7 @@ def main(observer_dbus: str, advertising_dbus: str) -> None:
 
     print("Listening to notifications...")
     loop.run()
+
+
+def cli() -> None:
+    typer.run(main)
