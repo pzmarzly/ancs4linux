@@ -21,10 +21,14 @@ jobs:
       run: |
         source .venv/bin/activate
         mypy --namespace-packages -p ancs4linux
-    - name: Black
+    - name: black
       run: |
         source .venv/bin/activate
         black --check .
+    - name: isort
+      run: |
+        source .venv/bin/activate
+        isort --check .
 
   run:
     runs-on: ubuntu-latest

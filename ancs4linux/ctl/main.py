@@ -1,5 +1,7 @@
-import typer
 import json
+
+import typer
+
 from ancs4linux.common.apis import AdvertisingAPI
 
 advertising_api: AdvertisingAPI

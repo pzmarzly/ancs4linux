@@ -1,7 +1,8 @@
 import typer
+
 from ancs4linux.common.dbus import EventLoop, SystemBus
-from ancs4linux.observer.server import ObserverServer
 from ancs4linux.observer.mobile_scanner import MobileScanner
+from ancs4linux.observer.server import ObserverServer
 
 app = typer.Typer()
 

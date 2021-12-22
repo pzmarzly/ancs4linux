@@ -1,12 +1,13 @@
 from typing import Any
+
 from ancs4linux.common.apis import AdvertisingAPI
 from ancs4linux.common.dbus import (
+    ObjPath,
     PairingRejected,
     Str,
+    SystemBus,
     UInt16,
     UInt32,
-    ObjPath,
-    SystemBus,
     dbus_interface,
 )
 

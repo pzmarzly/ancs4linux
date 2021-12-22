@@ -1,13 +1,14 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
+
 from ancs4linux.advertising.pairing import PairingManager
 from ancs4linux.common.dbus import (
-    Variant,
-    Str,
     Bool,
-    UInt16,
     Byte,
+    Str,
     SystemBus,
+    UInt16,
+    Variant,
     dbus_interface,
 )
 

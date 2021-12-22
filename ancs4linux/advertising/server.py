@@ -1,8 +1,9 @@
 from typing import List
-from ancs4linux.common.apis import AdvertisingAPI
-from ancs4linux.common.dbus import dbus_interface, dbus_signal, Str
+
 from ancs4linux.advertising.advertisement import AdvertisingManager
 from ancs4linux.advertising.pairing import PairingManager
+from ancs4linux.common.apis import AdvertisingAPI
+from ancs4linux.common.dbus import Str, dbus_interface, dbus_signal
 
 
 @dbus_interface("ancs4linux.Advertising")

@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Any, List, cast
-from ancs4linux.common.dbus import SessionBus, SystemBus, Str, UInt32, Int32, Variant
+
 from pydantic import BaseModel
+
+from ancs4linux.common.dbus import Int32, SessionBus, Str, SystemBus, UInt32, Variant
 
 Signal = Any
 

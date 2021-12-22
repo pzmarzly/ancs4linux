@@ -1,4 +1,5 @@
 from typing import Any, Callable
+
 import gi  # type: ignore # missing
 
 gi.require_version("GLib", "2.0")

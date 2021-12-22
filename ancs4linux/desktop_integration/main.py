@@ -1,12 +1,14 @@
 from typing import Dict
+
 import typer
+
 from ancs4linux.common.apis import (
     AdvertisingAPI,
-    ObserverAPI,
     NotificationAPI,
+    ObserverAPI,
     ShowNotificationData,
 )
-from ancs4linux.common.dbus import Int32, UInt32, EventLoop
+from ancs4linux.common.dbus import EventLoop, Int32, UInt32
 
 app = typer.Typer()
 notification_api: NotificationAPI

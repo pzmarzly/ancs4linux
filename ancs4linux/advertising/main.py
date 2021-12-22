@@ -1,8 +1,9 @@
 import typer
-from ancs4linux.advertising.pairing import PairingManager
-from ancs4linux.common.dbus import EventLoop, SystemBus
+
 from ancs4linux.advertising.advertisement import AdvertisingManager
+from ancs4linux.advertising.pairing import PairingManager
 from ancs4linux.advertising.server import AdvertisingServer
+from ancs4linux.common.dbus import EventLoop, SystemBus
 
 app = typer.Typer()
 
