@@ -1,11 +1,11 @@
 from typing import Type, cast
-from dasbus.loop import EventLoop
-from dasbus.connection import SystemMessageBus, SessionMessageBus
-from dasbus.server.interface import dbus_interface, dbus_signal
-from dasbus.error import ErrorMapper, DBusError, get_error_decorator
-from dasbus.typing import Bool, Byte, UInt16, Int16, UInt32, Int32
-from dasbus.typing import Str, ObjPath
-from dasbus.typing import Variant  # type: ignore # dynamic via PyGObject
+from dasbus.loop import EventLoop  # type: ignore # missing
+from dasbus.connection import SystemMessageBus, SessionMessageBus  # type: ignore # missing
+from dasbus.server.interface import dbus_interface, dbus_signal  # type: ignore # missing
+from dasbus.error import ErrorMapper, DBusError, get_error_decorator  # type: ignore # missing
+from dasbus.typing import Bool, Byte, UInt16, Int16, UInt32, Int32  # type: ignore # missing
+from dasbus.typing import Str, ObjPath  # type: ignore # missing
+from dasbus.typing import Variant  # type: ignore # dynamic
 
 EventLoop = EventLoop
 dbus_interface, dbus_signal = dbus_interface, dbus_signal

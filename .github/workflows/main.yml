@@ -1,0 +1,43 @@
+name: CI
+on: push
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-python@v2
+      with:
+        python-version: "3.7"
+        architecture: x64
+    - run: apt-get update
+    - run: apt-get install -y libgirepository1.0-dev
+    - uses: actions/checkout@v2
+    - name: Install Poetry
+      run: |
+        pip3 install poetry
+        poetry config virtualenvs.in-project true
+    - run: poetry install
+    - name: MyPy
+      run: |
+        source .venv/bin/activate
+        mypy --namespace-packages -p ancs4linux
+    - name: Black
+      run: |
+        source .venv/bin/activate
+        black --check .
+
+  run:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-python@v2
+      with:
+        python-version: "3.7"
+        architecture: x64
+    - run: apt-get update
+    - run: apt-get install -y libgirepository1.0-dev
+    - uses: actions/checkout@v2
+    - run: pip3 install .
+    - run: ancs4linux-advertising --help
+    - run: ancs4linux-ctl --help
+    - run: ancs4linux-desktop-integration --help
+    - run: ancs4linux-observer --help

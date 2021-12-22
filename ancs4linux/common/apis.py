@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Callable, List, cast
+from typing import Any, List, cast
 from ancs4linux.common.dbus import SessionBus, SystemBus, Str, UInt32, Int32, Variant
 from pydantic import BaseModel
+
+Signal = Any
 
 
 class ShowNotificationData(BaseModel):
@@ -21,18 +23,14 @@ class ObserverAPI(ABC):
         return cast(ObserverAPI, SystemBus().get_proxy(observer_dbus, "/"))
 
     def show_notification(self, data: ShowNotificationData) -> None:
-        cast(Callable, self.ShowNotification)(data.json())
+        self.ShowNotification(data.json())
 
-    @abstractmethod
-    def ShowNotification(self, json: Str) -> None:
-        pass
+    ShowNotification: Signal
 
     def dismiss_notification(self, id: UInt32) -> None:
-        cast(Callable, self.DismissNotification)(id)
+        self.DismissNotification(id)
 
-    @abstractmethod
-    def DismissNotification(self, id: UInt32) -> None:
-        pass
+    DismissNotification: Signal
 
 
 class AdvertisingAPI(ABC):
@@ -64,11 +62,9 @@ class AdvertisingAPI(ABC):
         pass
 
     def pairing_code(self, pin: str) -> None:
-        cast(Callable, self.PairingCode)(pin)
+        self.PairingCode(pin)
 
-    @abstractmethod
-    def PairingCode(self, pin: Str) -> None:
-        pass
+    PairingCode: Signal
 
 
 class NotificationAPI(ABC):
