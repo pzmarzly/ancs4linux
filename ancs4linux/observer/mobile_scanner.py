@@ -17,15 +17,15 @@ BLUEZ_GATT_CHARACTERISTIC = "org.bluez.GattCharacteristic1"
 class MobileScanner:
     def __init__(self, server: ObserverAPI):
         self.server = server
-        self.proxy: Any = SystemBus().get_proxy("org.bluez", "/")
+        self.root: Any = SystemBus().get_proxy("org.bluez", "/")
         self.devices: Dict[str, MobileDevice] = {}
 
     def start_observing(self):
         self.scan_tree()
-        self.proxy.InterfacesAdded.connect(lambda _path, _services: self.scan_tree)
+        self.root.InterfacesAdded.connect(lambda _path, _services: self.scan_tree)
 
     def scan_tree(self):
-        for path, services in self.proxy.GetManagedObjects().items():
+        for path, services in self.root.GetManagedObjects().items():
             self.process_object(path, services)
 
     def process_object(self, path, services) -> None:
