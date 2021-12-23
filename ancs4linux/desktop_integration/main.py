@@ -60,7 +60,7 @@ def new_notification(json: str) -> None:
     data = ShowNotificationData.parse_raw(json)
     notifications.setdefault(data.id, Notification(data.id))
     notifications[data.id].show(
-        data.title, f"{data.appID} on {data.device_name}", data.body
+        data.title, f"{data.appName} ({data.device_name})", data.body
     )
 
 

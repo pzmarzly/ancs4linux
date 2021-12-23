@@ -12,6 +12,7 @@ class ShowNotificationData(BaseModel):
     device_address: str
     device_name: str
     appID: str
+    appName: str
     id: int
     title: str
     body: str
