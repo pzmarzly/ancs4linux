@@ -77,12 +77,14 @@ def main(
     advertising_dbus: str = typer.Option(
         "ancs4linux.Advertising", help="Advertising service path"
     ),
-    notification_ttl: int = typer.Option(30, help="How long to show notifications for"),
+    notification_ms: int = typer.Option(
+        5000, help="How long to show notifications for"
+    ),
 ) -> None:
     loop = EventLoop()
 
     global notification_timeout
-    notification_timeout = notification_ttl
+    notification_timeout = notification_ms
 
     global observer_api, advertising_api, notification_api
     notification_api = NotificationAPI.connect()
