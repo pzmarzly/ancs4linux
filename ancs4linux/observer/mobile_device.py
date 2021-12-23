@@ -1,3 +1,4 @@
+import random
 import struct
 from typing import Any, Dict, List, Optional, cast
 
@@ -10,7 +11,9 @@ class MobileDevice:
     def __init__(self, path: str, server: ObserverAPI):
         self.server = server
         self.path = path
+        self.seed = random.randint(0, 10 ** 10)
         self.subscribed = False
+
         self.paired = False
         self.connected = False
         self.name: Optional[str] = None
@@ -75,8 +78,8 @@ class MobileDevice:
         try:
             # FIXME: blocking here (e.g. due to device not responding) can lock our program.
             # Timeouts (timeout=1000 [ms]) do not work.
-            self.notification_source.StartNotify()
             self.data_source.StartNotify()
+            self.notification_source.StartNotify()
         except Exception as e:
             print(f"Failed to start subscribe to notifications (is phone paired?): {e}")
             if hasattr(e, "dbus_name"):
@@ -85,47 +88,53 @@ class MobileDevice:
             return False
 
         self.notification_source.PropertiesChanged.disconnect()
-        self.notification_source.PropertiesChanged.connect(self.notification_change)
+        self.notification_source.PropertiesChanged.connect(self.on_ns_change)
         self.data_source.PropertiesChanged.disconnect()
-        self.data_source.PropertiesChanged.connect(self.notification_change_details)
+        self.data_source.PropertiesChanged.connect(self.on_ds_change)
         return True
 
-    def notification_change(
+    def on_ns_change(
         self, interface: str, changes: Dict[str, Variant], invalidated: List[str]
     ) -> None:
         if interface != "org.bluez.GattCharacteristic1" or "Value" not in changes:
             return
 
-        [op, _, _, _, id] = struct.unpack("<BBBBI", bytearray(changes["Value"]))
+        [op, flags, _, _, id] = struct.unpack("<BBBBI", bytearray(changes["Value"]))
         new_notification = 0
         updated_notification = 1
-        if op == new_notification or op == updated_notification:
-            get_details = list(
-                struct.pack(
-                    "<BIBBHBH",
-                    0,
-                    id,
-                    0,  # app id
-                    1,  # title
-                    65535,
-                    3,  # content
-                    65535,
-                )
-            )
-            self.control_point.WriteValue(get_details, {})
+        is_preexisting = flags & 4 > 0
+        if op == new_notification and not is_preexisting:
+            self.ask_for_notification_details(id)
+        elif op == updated_notification:
+            self.ask_for_notification_details(id)
         else:
             self.server.dismiss_notification(id)
 
-    def notification_change_details(
+    def ask_for_notification_details(self, id: int) -> None:
+        get_details = list(
+            struct.pack(
+                "<BIBBHBH",
+                0,
+                id,
+                0,  # app id
+                1,  # title
+                65535,
+                3,  # content
+                65535,
+            )
+        )
+        self.control_point.WriteValue(get_details, {})
+
+    def on_ds_change(
         self, interface: str, changes: Dict[str, Variant], invalidated: List[str]
     ) -> None:
         if interface != "org.bluez.GattCharacteristic1" or "Value" not in changes:
             return
         msg = bytearray(changes["Value"])
-        if len(msg) < 14:
-            return
 
-        id, msg = struct.unpack("<BI", msg[:5])[1], msg[5:]
+        cmd, msg = struct.unpack("<B", msg[:1])[0], msg[1:]
+        assert cmd == 0, cmd
+        id, msg = struct.unpack("<I", msg[:4])[0], msg[4:]
         appID_size, msg = struct.unpack("<BH", msg[:3])[1], msg[3:]
         appID_bytes, msg = msg[:appID_size], msg[appID_size:]
         title_size, msg = struct.unpack("<BH", msg[:3])[1], msg[3:]
@@ -142,7 +151,7 @@ class MobileDevice:
                 device_address=self.path,
                 device_name=self.name,
                 appID=appID,
-                id=id,
+                id=self.seed + id,
                 title=title,
                 body=body,
             )
