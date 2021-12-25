@@ -1,6 +1,6 @@
+import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-import json
 from typing import Any, List, cast
 
 from ancs4linux.common.dbus import Int32, SessionBus, Str, SystemBus, UInt32, Variant
