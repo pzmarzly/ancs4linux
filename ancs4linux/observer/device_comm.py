@@ -1,13 +1,14 @@
 import random
-from typing import TYPE_CHECKING, Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Dict, List, Set
 
 from ancs4linux.common.apis import ShowNotificationData
 from ancs4linux.common.dbus import Variant
 from ancs4linux.observer.ancs.builders import (
     GetAppAttributes,
     GetNotificationAttributes,
+    PerformNotificationAction,
 )
-from ancs4linux.observer.ancs.constants import CommandID, EventID
+from ancs4linux.observer.ancs.constants import UINT_MAX, CommandID, EventID
 from ancs4linux.observer.ancs.parsers import (
     AppAttributes,
     DataSourceEvent,
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
 class DeviceCommunicator:
     def __init__(self, device: "MobileDevice"):
         self.device = device
-        self.id = random.randint(0, 10 ** 10)
+        self.id = random.randint(1, 10 ** 5) * 1000
         self.notification_queue: List[ShowNotificationData] = []
         self.awaiting_app_names: Set[str] = set()
         self.known_app_names: Dict[str, str] = dict()
@@ -73,11 +74,11 @@ class DeviceCommunicator:
         assert self.device.name
         self.queue_notification(
             ShowNotificationData(
-                device_address=self.device.path,
+                device_handle=self.device.path,
                 device_name=self.device.name,
                 app_id=attrs.app_id,
                 app_name="",
-                id=self.id + attrs.id,
+                id=(self.id + attrs.id) % UINT_MAX,
                 title=attrs.title,
                 body=attrs.message,
                 positive_action=attrs.positive_action,
@@ -114,3 +115,9 @@ class DeviceCommunicator:
                 self.ask_for_app_name(data.app_id)
                 unprocessed.append(data)
         self.notification_queue = unprocessed
+
+    def ask_for_action(self, notification_id: int, is_positive: bool) -> None:
+        id = (notification_id - self.id) % UINT_MAX
+        msg = PerformNotificationAction(notification_id=id, is_positive=is_positive)
+        assert self.device.control_point
+        self.device.control_point.WriteValue(msg.to_list(), {})

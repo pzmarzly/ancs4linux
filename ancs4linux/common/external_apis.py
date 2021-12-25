@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, cast
+from typing import Dict, List, cast
 
 from ancs4linux.common.dbus import (
+    Signal,
     ObjPath,
     Int32,
     SessionBus,
@@ -27,7 +28,7 @@ class PropertiesAPI(ABC):
     def Set(self, interface: Str, name: Str, value: Variant) -> None:
         pass
 
-    PropertiesChanged: Any
+    PropertiesChanged: Signal
 
 
 class ObjectManagerAPI(ABC):
@@ -37,9 +38,9 @@ class ObjectManagerAPI(ABC):
     def GetManagedObjects(self) -> Dict[ObjPath, Dict[Str, Dict[Str, Variant]]]:
         pass
 
-    InterfacesAdded: Any
+    InterfacesAdded: Signal
 
-    InterfacesRemoved: Any
+    InterfacesRemoved: Signal
 
 
 class NotificationAPI(ABC):
@@ -70,6 +71,10 @@ class NotificationAPI(ABC):
     @abstractmethod
     def CloseNotification(self, id: UInt32) -> None:
         pass
+
+    NotificationClosed: Signal
+
+    ActionInvoked: Signal
 
 
 class BluezRootAPI(ObjectManagerAPI, ABC):

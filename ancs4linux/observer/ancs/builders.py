@@ -3,12 +3,12 @@ from dataclasses import dataclass
 from typing import List
 
 from ancs4linux.observer.ancs.constants import (
+    USHORT_MAX,
+    ActionID,
     AppAttributeID,
     CommandID,
     NotificationAttributeID,
 )
-
-USHORT_MAX = 65535
 
 
 @dataclass
@@ -45,5 +45,20 @@ class GetAppAttributes:
             CommandID.GetAppAttributes,
             self.app_id.encode("utf8"),
             AppAttributeID.DisplayName,
+        )
+        return list(msg)
+
+
+@dataclass
+class PerformNotificationAction:
+    notification_id: int
+    is_positive: bool
+
+    def to_list(self) -> List[int]:
+        msg = struct.pack(
+            f"<BIB",
+            CommandID.PerformNotificationAction,
+            self.notification_id,
+            ActionID.Positive if self.is_positive else ActionID.Negative,
         )
         return list(msg)

@@ -1,17 +1,15 @@
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, List, Optional, cast
+from typing import List, Optional, cast
 
-from ancs4linux.common.dbus import ObjPath, Str, SystemBus, UInt32
-
-Signal = Any
+from ancs4linux.common.dbus import Signal, Bool, ObjPath, Str, SystemBus, UInt32
 
 
 @dataclass
 class ShowNotificationData:
-    device_address: str
     device_name: str
+    device_handle: str
     app_id: str
     app_name: str
     id: int
@@ -38,6 +36,12 @@ class ObserverAPI(ABC):
     @classmethod
     def connect(cls, observer_dbus: str) -> "ObserverAPI":
         return cast(ObserverAPI, SystemBus().get_proxy(observer_dbus, cls.path))
+
+    @abstractmethod
+    def InvokeDeviceAction(
+        self, device_handle: Str, notification_id: UInt32, is_positive: Bool
+    ) -> None:
+        pass
 
     def emit_show_notification(self, data: ShowNotificationData) -> None:
         self.ShowNotification(data.json())

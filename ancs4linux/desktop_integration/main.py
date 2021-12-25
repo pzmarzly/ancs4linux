@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import typer
 
@@ -21,16 +21,23 @@ notifications: Dict[int, "Notification"] = {}
 class Notification:
     def __init__(self, id: int):
         self.device_id = id
+        self.device_handle: Optional[str] = None
         self.host_id = 0
 
     def show(self, data: ShowNotificationData) -> None:
+        self.device_handle = data.device_handle
+        actions = []
+        if data.positive_action is not None:
+            actions.extend(["positive-action", data.positive_action])
+        if data.negative_action is not None:
+            actions.extend(["negative-action", data.negative_action])
         self.host_id = notification_api.Notify(
             f"{data.app_name} ({data.device_name})",
             UInt32(self.host_id),
             "",
             data.title,
             data.body,
-            [x for x in [data.positive_action, data.negative_action] if x is not None],
+            actions,
             [],
             Int32(notification_timeout),
         )
@@ -41,6 +48,16 @@ class Notification:
             notification_api.CloseNotification(UInt32(self.host_id))
             print(f"Hidden {self.host_id}.")
             self.host_id = 0
+
+    def on_action(self, action: str) -> None:
+        if self.device_handle and action == "positive-action":
+            observer_api.InvokeDeviceAction(
+                self.device_handle, UInt32(self.device_id), True
+            )
+        if self.device_handle and action == "negative-action":
+            observer_api.InvokeDeviceAction(
+                self.device_handle, UInt32(self.device_id), False
+            )
 
 
 def pairing_code(pin: str) -> None:
@@ -67,6 +84,17 @@ def dismiss_notification(id: int) -> None:
         notifications[id].dismiss()
 
 
+def action_clicked(host_id: int, action: str) -> None:
+    for notification in notifications.values():
+        if notification.host_id == host_id:
+            notification.on_action(action)
+
+
+def notification_closed(id: int, reason: int) -> None:
+    if id in notifications:
+        del notifications[id]
+
+
 @app.command()
 def main(
     observer_dbus: str = typer.Option(
@@ -89,9 +117,11 @@ def main(
     advertising_api = AdvertisingAPI.connect(advertising_dbus)
     observer_api = ObserverAPI.connect(observer_dbus)
 
+    notification_api.ActionInvoked.connect(action_clicked)
+    notification_api.NotificationClosed.connect(notification_closed)
     advertising_api.PairingCode.connect(pairing_code)
     observer_api.ShowNotification.connect(new_notification)
-    observer_api.DismissNotification.connect(new_notification)
+    observer_api.DismissNotification.connect(dismiss_notification)
 
     print("Listening to notifications...")
     loop.run()

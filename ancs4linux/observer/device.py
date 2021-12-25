@@ -11,7 +11,7 @@ class MobileDevice:
     def __init__(self, path: str, server: ObserverAPI):
         self.server = server
         self.path = path
-        self.subscribed = False
+        self.communicator = None
 
         self.paired = False
         self.connected = False
@@ -51,7 +51,7 @@ class MobileDevice:
         self.try_subscribe()
 
     def unsubscribe(self) -> None:
-        self.subscribed = False
+        self.communicator = None
 
     def try_subscribe(self) -> None:
         if not (
@@ -61,6 +61,7 @@ class MobileDevice:
             and self.notification_source
             and self.control_point
             and self.data_source
+            and not self.communicator
         ):
             return
 
@@ -86,5 +87,12 @@ class MobileDevice:
                 print(f"Original error: {get_dbus_error_name(e)}")
             return False
 
-        DeviceCommunicator(self).attach()
+        comm = DeviceCommunicator(self)
+        comm.attach()
+        self.communicator = comm
+
         return True
+
+    def handle_action(self, notification_id: int, is_positive: bool) -> None:
+        if self.communicator is not None:
+            self.communicator.ask_for_action(notification_id, is_positive)
