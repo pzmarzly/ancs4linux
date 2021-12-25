@@ -23,18 +23,18 @@ class Notification:
         self.device_id = id
         self.host_id = 0
 
-    def show(self, summary: str, app_name: str, body: str) -> None:
+    def show(self, data: ShowNotificationData) -> None:
         self.host_id = notification_api.Notify(
-            app_name,
+            f"{data.app_name} ({data.device_name})",
             UInt32(self.host_id),
             "",
-            summary,
-            body,
-            [],
+            data.title,
+            data.body,
+            [x for x in [data.positive_action, data.negative_action] if x is not None],
             [],
             Int32(notification_timeout),
         )
-        print(f"Shown {self.host_id} from {app_name}.")
+        print(f"Shown {self.host_id} from {data.app_name}.")
 
     def dismiss(self) -> None:
         if self.host_id != 0:
@@ -59,9 +59,7 @@ def pairing_code(pin: str) -> None:
 def new_notification(json: str) -> None:
     data = ShowNotificationData.parse(json)
     notifications.setdefault(data.id, Notification(data.id))
-    notifications[data.id].show(
-        data.title, f"{data.appName} ({data.device_name})", data.body
-    )
+    notifications[data.id].show(data)
 
 
 def dismiss_notification(id: int) -> None:

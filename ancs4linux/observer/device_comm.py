@@ -1,8 +1,7 @@
 import random
-from typing import Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Dict, List, Optional, Set
 
-from ancs4linux.common.apis import ObserverAPI, ShowNotificationData
-from ancs4linux.common.external_apis import BluezGattCharacteristicAPI
+from ancs4linux.common.apis import ShowNotificationData
 from ancs4linux.common.dbus import Variant
 from ancs4linux.observer.ancs.builders import (
     GetAppAttributes,
@@ -16,33 +15,24 @@ from ancs4linux.observer.ancs.parsers import (
     NotificationAttributes,
 )
 
+if TYPE_CHECKING:
+    from ancs4linux.observer.device import MobileDevice
+
 
 class DeviceCommunicator:
-    def __init__(
-        self,
-        path: str,
-        server: ObserverAPI,
-        ns: BluezGattCharacteristicAPI,
-        cp: BluezGattCharacteristicAPI,
-        ds: BluezGattCharacteristicAPI,
-    ):
-        self.server = server
-        self.path = path
-        self.seed = random.randint(0, 10 ** 10)
+    def __init__(self, device: "MobileDevice"):
+        self.device = device
+        self.id = random.randint(0, 10 ** 10)
         self.notification_queue: List[ShowNotificationData] = []
         self.awaiting_app_names: Set[str] = set()
         self.known_app_names: Dict[str, str] = dict()
 
-        self.name: Optional[str] = None
-        self.notification_source = ns
-        self.control_point = cp
-        self.data_source = ds
-
     def attach(self) -> None:
-        self.notification_source.PropertiesChanged.disconnect()
-        self.notification_source.PropertiesChanged.connect(self.on_ns_change)
-        self.data_source.PropertiesChanged.disconnect()
-        self.data_source.PropertiesChanged.connect(self.on_ds_change)
+        assert self.device.notification_source and self.device.data_source
+        self.device.notification_source.PropertiesChanged.disconnect()
+        self.device.notification_source.PropertiesChanged.connect(self.on_ns_change)
+        self.device.data_source.PropertiesChanged.disconnect()
+        self.device.data_source.PropertiesChanged.connect(self.on_ds_change)
 
     def on_ns_change(
         self, interface: str, changes: Dict[str, Variant], invalidated: List[str]
@@ -52,15 +42,20 @@ class DeviceCommunicator:
 
         notification = Notification.parse(changes["Value"].unpack())
         if notification.type == EventID.NotificationAdded and notification.is_fresh():
-            self.ask_for_notification_details(notification.id)
+            self.ask_for_notification_details(notification)
         elif notification.type == EventID.NotificationModified:
-            self.ask_for_notification_details(notification.id)
+            self.ask_for_notification_details(notification)
         else:
-            self.server.emit_dismiss_notification(notification.id)
+            self.device.server.emit_dismiss_notification(notification.id)
 
-    def ask_for_notification_details(self, id: int) -> None:
-        msg = GetNotificationAttributes(id=id)
-        self.control_point.WriteValue(msg.to_list(), {})
+    def ask_for_notification_details(self, notification: Notification) -> None:
+        msg = GetNotificationAttributes(
+            id=notification.id,
+            get_positive_action=notification.has_positive_action(),
+            get_negative_action=notification.has_negative_action(),
+        )
+        assert self.device.control_point
+        self.device.control_point.WriteValue(msg.to_list(), {})
 
     def on_ds_change(
         self, interface: str, changes: Dict[str, Variant], invalidated: List[str]
@@ -75,16 +70,18 @@ class DeviceCommunicator:
             self.on_app_attributes(ev.as_app_attributes())
 
     def on_notification_attributes(self, attrs: NotificationAttributes) -> None:
-        assert self.name
+        assert self.device.name
         self.queue_notification(
             ShowNotificationData(
-                device_address=self.path,
-                device_name=self.name,
-                appID=attrs.app_id,
-                appName="",
-                id=self.seed + attrs.id,
+                device_address=self.device.path,
+                device_name=self.device.name,
+                app_id=attrs.app_id,
+                app_name="",
+                id=self.id + attrs.id,
                 title=attrs.title,
                 body=attrs.message,
+                positive_action=attrs.positive_action,
+                negative_action=attrs.negative_action,
             )
         )
         self.process_queue()
@@ -97,22 +94,23 @@ class DeviceCommunicator:
     def queue_notification(self, data: ShowNotificationData) -> None:
         self.notification_queue.append(data)
 
-    def ask_for_app_name(self, appID: str) -> None:
-        self.awaiting_app_names.add(appID)
-        msg = GetAppAttributes(app_id=appID)
-        self.control_point.WriteValue(msg.to_list(), {})
+    def ask_for_app_name(self, app_id: str) -> None:
+        self.awaiting_app_names.add(app_id)
+        msg = GetAppAttributes(app_id=app_id)
+        assert self.device.control_point
+        self.device.control_point.WriteValue(msg.to_list(), {})
 
     def process_queue(self) -> None:
         unprocessed = []
         for data in self.notification_queue:
-            if data.appName != "":
-                self.server.emit_show_notification(data)
-            elif data.appID in self.known_app_names:
-                data.appName = self.known_app_names[data.appID]
-                self.server.emit_show_notification(data)
-            elif data.appID in self.awaiting_app_names:
+            if data.app_name != "":
+                self.device.server.emit_show_notification(data)
+            elif data.app_id in self.known_app_names:
+                data.app_name = self.known_app_names[data.app_id]
+                self.device.server.emit_show_notification(data)
+            elif data.app_id in self.awaiting_app_names:
                 unprocessed.append(data)
             else:
-                self.ask_for_app_name(data.appID)
+                self.ask_for_app_name(data.app_id)
                 unprocessed.append(data)
         self.notification_queue = unprocessed

@@ -38,21 +38,18 @@ class Scanner:
                 )
                 proxy = BluezDeviceAPI.connect(path)
                 proxy.PropertiesChanged.connect(partial(self.process_property, path))
-                return
 
             if BluezGattCharacteristicAPI.interface in services:
                 uuid = services[BluezGattCharacteristicAPI.interface]["UUID"].unpack()
-                if uuid not in ANCS_CHARS:
-                    return
-                device = "/".join(path.split("/")[:-2])
-                self.devices.setdefault(device, MobileDevice(device, self.server))
-                if uuid == NOTIFICATION_SOURCE_CHAR:
-                    self.devices[device].set_notification_source(path)
-                elif uuid == CONTROL_POINT_CHAR:
-                    self.devices[device].set_control_point(path)
-                elif uuid == DATA_SOURCE_CHAR:
-                    self.devices[device].set_data_source(path)
-                return
+                if uuid in ANCS_CHARS:
+                    device = "/".join(path.split("/")[:-2])
+                    self.devices.setdefault(device, MobileDevice(device, self.server))
+                    if uuid == NOTIFICATION_SOURCE_CHAR:
+                        self.devices[device].set_notification_source(path)
+                    elif uuid == CONTROL_POINT_CHAR:
+                        self.devices[device].set_control_point(path)
+                    elif uuid == DATA_SOURCE_CHAR:
+                        self.devices[device].set_data_source(path)
 
     def process_property(
         self,

@@ -86,13 +86,5 @@ class MobileDevice:
                 print(f"Original error: {get_dbus_error_name(e)}")
             return False
 
-        comm = DeviceCommunicator(
-            self.path,
-            self.server,
-            self.notification_source,
-            self.control_point,
-            self.data_source,
-        )
-        comm.attach()
-
+        DeviceCommunicator(self).attach()
         return True

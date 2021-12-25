@@ -1,7 +1,19 @@
 import struct
 from dataclasses import dataclass
+from typing import Optional, Tuple
 
-from ancs4linux.observer.ancs.constants import CommandID, EventFlag, EventID
+from ancs4linux.observer.ancs.constants import (
+    CommandID,
+    EventFlag,
+    EventID,
+    NotificationAttributeID,
+)
+
+
+def parse_string(data: bytearray) -> Tuple[str, bytearray]:
+    (type, size), data = struct.unpack("<BH", data[:3]), data[3:]
+    bytes, data = data[:size], data[size:]
+    return bytes.decode("utf8", errors="replace"), data
 
 
 @dataclass
@@ -23,6 +35,9 @@ class Notification:
 
     def has_positive_action(self) -> bool:
         return self.flags & EventFlag.PositiveAction > 0
+
+    def has_negative_action(self) -> bool:
+        return self.flags & EventFlag.NegativeAction > 0
 
 
 @dataclass
@@ -51,21 +66,29 @@ class NotificationAttributes:
     app_id: str
     title: str
     message: str
+    positive_action: Optional[str]
+    negative_action: Optional[str]
 
     @classmethod
     def parse(cls, data: bytes) -> "NotificationAttributes":
         msg = bytearray(data)
         id, msg = struct.unpack("<I", msg[:4])[0], msg[4:]
-        app_id_size, msg = struct.unpack("<BH", msg[:3])[1], msg[3:]
-        app_id_bytes, msg = msg[:app_id_size], msg[app_id_size:]
-        app_id = app_id_bytes.decode("utf8", errors="replace")
-        title_size, msg = struct.unpack("<BH", msg[:3])[1], msg[3:]
-        title_bytes, msg = msg[:title_size], msg[title_size:]
-        title = title_bytes.decode("utf8", errors="replace")
-        message_size, msg = struct.unpack("<BH", msg[:3])[1], msg[3:]
-        message_bytes, msg = msg[:message_size], msg[message_size:]
-        message = message_bytes.decode("utf8", errors="replace")
-        return cls(id=id, app_id=app_id, title=title, message=message)
+        app_id, msg = parse_string(msg)
+        title, msg = parse_string(msg)
+        message, msg = parse_string(msg)
+        positive_action = negative_action = None
+        if len(msg) > 0 and msg[0] == NotificationAttributeID.PositiveActionLabel:
+            positive_action, msg = parse_string(msg)
+        if len(msg) > 0 and msg[0] == NotificationAttributeID.NegativeActionLabel:
+            negative_action, msg = parse_string(msg)
+        return cls(
+            id=id,
+            app_id=app_id,
+            title=title,
+            message=message,
+            positive_action=positive_action,
+            negative_action=negative_action,
+        )
 
 
 @dataclass

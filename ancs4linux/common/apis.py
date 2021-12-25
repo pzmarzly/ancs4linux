@@ -1,7 +1,7 @@
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, List, cast
+from typing import Any, List, Optional, cast
 
 from ancs4linux.common.dbus import ObjPath, Str, SystemBus, UInt32
 
@@ -12,11 +12,13 @@ Signal = Any
 class ShowNotificationData:
     device_address: str
     device_name: str
-    appID: str
-    appName: str
+    app_id: str
+    app_name: str
     id: int
     title: str
     body: str
+    positive_action: Optional[str]
+    negative_action: Optional[str]
 
     def json(self) -> str:
         return json.dumps(vars(self))

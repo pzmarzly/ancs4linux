@@ -14,6 +14,8 @@ USHORT_MAX = 65535
 @dataclass
 class GetNotificationAttributes:
     id: int
+    get_positive_action: bool
+    get_negative_action: bool
 
     def to_list(self) -> List[int]:
         msg = struct.pack(
@@ -26,6 +28,10 @@ class GetNotificationAttributes:
             NotificationAttributeID.Message,
             USHORT_MAX,
         )
+        if self.get_positive_action:
+            msg += struct.pack("<B", NotificationAttributeID.PositiveActionLabel)
+        if self.get_negative_action:
+            msg += struct.pack("<B", NotificationAttributeID.NegativeActionLabel)
         return list(msg)
 
 
