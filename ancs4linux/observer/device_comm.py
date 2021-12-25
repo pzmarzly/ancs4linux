@@ -1,7 +1,8 @@
 import random
-from typing import Any, Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set
 
 from ancs4linux.common.apis import ObserverAPI, ShowNotificationData
+from ancs4linux.common.external_apis import GattCharacteristicAPI
 from ancs4linux.common.dbus import Variant
 from ancs4linux.observer.ancs.builders import (
     GetAppAttributes,
@@ -17,7 +18,14 @@ from ancs4linux.observer.ancs.parsers import (
 
 
 class DeviceCommunicator:
-    def __init__(self, path: str, server: ObserverAPI, ns: Any, cp: Any, ds: Any):
+    def __init__(
+        self,
+        path: str,
+        server: ObserverAPI,
+        ns: GattCharacteristicAPI,
+        cp: GattCharacteristicAPI,
+        ds: GattCharacteristicAPI,
+    ):
         self.server = server
         self.path = path
         self.seed = random.randint(0, 10 ** 10)

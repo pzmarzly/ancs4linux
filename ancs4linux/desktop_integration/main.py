@@ -4,10 +4,10 @@ import typer
 
 from ancs4linux.common.apis import (
     AdvertisingAPI,
-    NotificationAPI,
     ObserverAPI,
     ShowNotificationData,
 )
+from ancs4linux.common.external_apis import NotificationAPI
 from ancs4linux.common.dbus import EventLoop, Int32, UInt32
 
 app = typer.Typer()

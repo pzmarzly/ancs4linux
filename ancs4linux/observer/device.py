@@ -1,7 +1,8 @@
-from typing import Any, Optional, cast
+from typing import Optional
 
 from ancs4linux.common.apis import ObserverAPI
-from ancs4linux.common.dbus import SystemBus
+from ancs4linux.common.dbus import get_dbus_error_name
+from ancs4linux.common.external_apis import GattCharacteristicAPI
 from ancs4linux.common.task_restarter import TaskRestarter
 from ancs4linux.observer.device_comm import DeviceCommunicator
 
@@ -15,23 +16,23 @@ class MobileDevice:
         self.paired = False
         self.connected = False
         self.name: Optional[str] = None
-        self.notification_source: Any = None
-        self.control_point: Any = None
-        self.data_source: Any = None
+        self.notification_source: Optional[GattCharacteristicAPI] = None
+        self.control_point: Optional[GattCharacteristicAPI] = None
+        self.data_source: Optional[GattCharacteristicAPI] = None
 
     def set_notification_source(self, path: str) -> None:
         self.unsubscribe()
-        self.notification_source = SystemBus().get_proxy("org.bluez", path)
+        self.notification_source = GattCharacteristicAPI.connect(path)
         self.try_subscribe()
 
     def set_control_point(self, path: str) -> None:
         self.unsubscribe()
-        self.control_point = SystemBus().get_proxy("org.bluez", path)
+        self.control_point = GattCharacteristicAPI.connect(path)
         self.try_subscribe()
 
     def set_data_source(self, path: str) -> None:
         self.unsubscribe()
-        self.data_source = SystemBus().get_proxy("org.bluez", path)
+        self.data_source = GattCharacteristicAPI.connect(path)
         self.try_subscribe()
 
     def set_paired(self, paired: bool) -> None:
@@ -73,6 +74,7 @@ class MobileDevice:
         ).try_running_bg()
 
     def try_asking(self) -> bool:
+        assert self.notification_source and self.control_point and self.data_source
         try:
             # FIXME: blocking here (e.g. due to device not responding) can lock our program.
             # Timeouts (timeout=1000 [ms]) do not work.
@@ -80,9 +82,8 @@ class MobileDevice:
             self.notification_source.StartNotify()
         except Exception as e:
             print(f"Failed to start subscribe to notifications (is phone paired?): {e}")
-            if hasattr(e, "dbus_name"):
-                name = cast(Any, e).dbus_name
-                print(f"Original error: {name}")
+            if get_dbus_error_name(e) is not None:
+                print(f"Original error: {get_dbus_error_name(e)}")
             return False
 
         comm = DeviceCommunicator(

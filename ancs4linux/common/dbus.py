@@ -1,4 +1,5 @@
-from typing import Type, cast
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Type, cast
 
 from dasbus.connection import (  # type: ignore # missing
     SessionMessageBus,
@@ -48,3 +49,9 @@ def SystemBus() -> SystemMessageBus:
 
 def SessionBus() -> SessionMessageBus:
     return SessionMessageBus(error_mapper=error_mapper)
+
+
+def get_dbus_error_name(ex: Exception) -> Optional[str]:
+    if hasattr(ex, "dbus_name"):
+        return cast(Any, ex).dbus_name
+    return None

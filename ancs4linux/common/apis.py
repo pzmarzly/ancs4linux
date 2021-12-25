@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, List, cast
 
-from ancs4linux.common.dbus import Int32, SessionBus, Str, SystemBus, UInt32, Variant
+from ancs4linux.common.dbus import Str, SystemBus, UInt32
 
 Signal = Any
 
@@ -77,34 +77,3 @@ class AdvertisingAPI(ABC):
         self.PairingCode(pin)
 
     PairingCode: Signal
-
-
-class NotificationAPI(ABC):
-    """https://specifications.freedesktop.org/notification-spec/notification-spec-latest.html"""
-
-    @classmethod
-    def connect(cls) -> "NotificationAPI":
-        return cast(
-            NotificationAPI,
-            SessionBus().get_proxy(
-                "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
-            ),
-        )
-
-    @abstractmethod
-    def Notify(
-        self,
-        app_name: Str,
-        replaces_id: UInt32,
-        app_icon: Str,
-        summary: Str,
-        body: Str,
-        actions: List[Str],
-        hints: List[Variant],
-        expire_timeout: Int32,
-    ) -> UInt32:
-        pass
-
-    @abstractmethod
-    def CloseNotification(self, id: UInt32) -> None:
-        pass
