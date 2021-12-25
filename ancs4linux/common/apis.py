@@ -3,9 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, List, cast
 
-from dasbus.typing import ObjPath
-
-from ancs4linux.common.dbus import Str, SystemBus, UInt32
+from ancs4linux.common.dbus import ObjPath, Str, SystemBus, UInt32
 
 Signal = Any
 

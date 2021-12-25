@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Type, cast
+from typing import TYPE_CHECKING, Any, Optional, Type, cast
 
 from dasbus.connection import (  # type: ignore # missing
     SessionMessageBus,
@@ -31,7 +31,20 @@ EventLoop = EventLoop
 dbus_interface, dbus_signal = dbus_interface, dbus_signal
 Bool, Byte, UInt16, Int16, UInt32, Int32 = Bool, Byte, UInt16, Int16, UInt32, Int32
 Str, ObjPath = Str, ObjPath
-Variant = cast(Type, Variant)
+
+
+class VariantStub:
+    def __init__(self, format: str, data: Any):
+        pass
+
+    def unpack(self) -> Any:
+        pass
+
+
+if TYPE_CHECKING:
+    Variant = VariantStub
+else:
+    Variant = Variant
 
 error_mapper = ErrorMapper()
 DBusError = DBusError
