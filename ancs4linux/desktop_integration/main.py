@@ -57,7 +57,7 @@ def pairing_code(pin: str) -> None:
 
 
 def new_notification(json: str) -> None:
-    data = ShowNotificationData.parse_raw(json)
+    data = ShowNotificationData.parse(json)
     notifications.setdefault(data.id, Notification(data.id))
     notifications[data.id].show(
         data.title, f"{data.appName} ({data.device_name})", data.body

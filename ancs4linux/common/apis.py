@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+import json
 from typing import Any, List, cast
-
-from pydantic import BaseModel
 
 from ancs4linux.common.dbus import Int32, SessionBus, Str, SystemBus, UInt32, Variant
 
 Signal = Any
 
 
-class ShowNotificationData(BaseModel):
+@dataclass
+class ShowNotificationData:
     device_address: str
     device_name: str
     appID: str
@@ -16,6 +17,13 @@ class ShowNotificationData(BaseModel):
     id: int
     title: str
     body: str
+
+    def json(self) -> str:
+        return json.dumps(vars(self))
+
+    @classmethod
+    def parse(cls, data: str) -> "ShowNotificationData":
+        return cls(**json.loads(data))
 
 
 class ObserverAPI(ABC):
