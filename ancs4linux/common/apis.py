@@ -34,12 +34,12 @@ class ObserverAPI(ABC):
     def connect(cls, observer_dbus: str) -> "ObserverAPI":
         return cast(ObserverAPI, SystemBus().get_proxy(observer_dbus, "/"))
 
-    def show_notification(self, data: ShowNotificationData) -> None:
+    def emit_show_notification(self, data: ShowNotificationData) -> None:
         self.ShowNotification(data.json())
 
     ShowNotification: Signal
 
-    def dismiss_notification(self, id: int) -> None:
+    def emit_dismiss_notification(self, id: int) -> None:
         self.DismissNotification(UInt32(id))
 
     DismissNotification: Signal
@@ -73,7 +73,7 @@ class AdvertisingAPI(ABC):
     def DisablePairing(self) -> None:
         pass
 
-    def pairing_code(self, pin: str) -> None:
+    def emit_pairing_code(self, pin: str) -> None:
         self.PairingCode(pin)
 
     PairingCode: Signal

@@ -48,7 +48,7 @@ class DeviceCommunicator:
         elif notification.type == EventID.NotificationModified:
             self.ask_for_notification_details(notification.id)
         else:
-            self.server.dismiss_notification(notification.id)
+            self.server.emit_dismiss_notification(notification.id)
 
     def ask_for_notification_details(self, id: int) -> None:
         msg = GetNotificationAttributes(id=id)
@@ -98,10 +98,10 @@ class DeviceCommunicator:
         unprocessed = []
         for data in self.notification_queue:
             if data.appName != "":
-                self.server.show_notification(data)
+                self.server.emit_show_notification(data)
             elif data.appID in self.known_app_names:
                 data.appName = self.known_app_names[data.appID]
-                self.server.show_notification(data)
+                self.server.emit_show_notification(data)
             elif data.appID in self.awaiting_app_names:
                 unprocessed.append(data)
             else:

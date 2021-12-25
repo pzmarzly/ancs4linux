@@ -33,7 +33,7 @@ class PairingAgent:
         raise PairingRejected
 
     def RequestConfirmation(self, device: ObjPath, passkey: UInt32) -> None:
-        self.server.pairing_code(str(int(passkey)))
+        self.server.emit_pairing_code(str(int(passkey)))
 
     def RequestAuthorization(self, device: ObjPath) -> None:
         raise PairingRejected
