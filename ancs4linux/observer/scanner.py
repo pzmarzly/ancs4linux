@@ -4,9 +4,9 @@ from typing import Dict, List
 from ancs4linux.common.apis import ObserverAPI
 from ancs4linux.common.dbus import Variant
 from ancs4linux.common.external_apis import (
-    BluezRoot,
+    BluezRootAPI,
     BluezDeviceAPI,
-    GattCharacteristicAPI,
+    BluezGattCharacteristicAPI,
 )
 from ancs4linux.observer.ancs.constants import (
     ANCS_CHARS,
@@ -20,7 +20,7 @@ from ancs4linux.observer.device import MobileDevice
 class Scanner:
     def __init__(self, server: ObserverAPI):
         self.server = server
-        self.root = BluezRoot.connect()
+        self.root = BluezRootAPI.connect()
         self.devices: Dict[str, MobileDevice] = {}
 
     def start_observing(self):
@@ -29,19 +29,19 @@ class Scanner:
 
     def scan_tree(self):
         for path, services in self.root.GetManagedObjects().items():
-            if BluezDeviceAPI.INTERFACE in services:
+            if BluezDeviceAPI.interface in services:
                 self.process_property(
                     path,
-                    BluezDeviceAPI.INTERFACE,
-                    services[BluezDeviceAPI.INTERFACE],
+                    BluezDeviceAPI.interface,
+                    services[BluezDeviceAPI.interface],
                     [],
                 )
                 proxy = BluezDeviceAPI.connect(path)
                 proxy.PropertiesChanged.connect(partial(self.process_property, path))
                 return
 
-            if GattCharacteristicAPI.INTERFACE in services:
-                uuid = services[GattCharacteristicAPI.INTERFACE]["UUID"].unpack()
+            if BluezGattCharacteristicAPI.interface in services:
+                uuid = services[BluezGattCharacteristicAPI.interface]["UUID"].unpack()
                 if uuid not in ANCS_CHARS:
                     return
                 device = "/".join(path.split("/")[:-2])
@@ -61,7 +61,7 @@ class Scanner:
         changes: Dict[str, Variant],
         invalidated: List[str],
     ) -> None:
-        if interface == BluezDeviceAPI.INTERFACE:
+        if interface == BluezDeviceAPI.interface:
             self.devices.setdefault(device, MobileDevice(device, self.server))
             if "Paired" in changes:
                 self.devices[device].set_paired(changes["Paired"].unpack())

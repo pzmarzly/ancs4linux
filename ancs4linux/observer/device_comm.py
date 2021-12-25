@@ -2,7 +2,7 @@ import random
 from typing import Dict, List, Optional, Set
 
 from ancs4linux.common.apis import ObserverAPI, ShowNotificationData
-from ancs4linux.common.external_apis import GattCharacteristicAPI
+from ancs4linux.common.external_apis import BluezGattCharacteristicAPI
 from ancs4linux.common.dbus import Variant
 from ancs4linux.observer.ancs.builders import (
     GetAppAttributes,
@@ -22,9 +22,9 @@ class DeviceCommunicator:
         self,
         path: str,
         server: ObserverAPI,
-        ns: GattCharacteristicAPI,
-        cp: GattCharacteristicAPI,
-        ds: GattCharacteristicAPI,
+        ns: BluezGattCharacteristicAPI,
+        cp: BluezGattCharacteristicAPI,
+        ds: BluezGattCharacteristicAPI,
     ):
         self.server = server
         self.path = path

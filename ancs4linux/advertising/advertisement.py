@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 
 from ancs4linux.advertising.pairing import PairingManager
 from ancs4linux.common.dbus import (
+    ObjPath,
     Bool,
     Byte,
     Str,
@@ -11,6 +12,7 @@ from ancs4linux.common.dbus import (
     Variant,
     dbus_interface,
 )
+from ancs4linux.common.external_apis import BluezRootAPI
 
 
 def array_of_bytes(array: List[int]) -> Variant:
@@ -94,15 +96,17 @@ class HciState:
 
 
 class AdvertisingManager:
+    ADDRESS = ObjPath("/advertisement")
+
     def __init__(self, pairing_manager: PairingManager):
         self.active_advertisements: Dict[str, HciState] = {}
         self.pairing_manager = pairing_manager
 
     def register(self) -> None:
-        SystemBus().publish_object("/advertisement", AdvertisementData())
+        SystemBus().publish_object(self.ADDRESS, AdvertisementData())
 
-    def get_all_hci(self) -> Dict[str, Dict[str, Dict[str, Any]]]:
-        proxy: Any = SystemBus().get_proxy("org.bluez", "/")
+    def get_all_hci(self) -> Dict[ObjPath, Dict[str, Dict[str, Variant]]]:
+        proxy = BluezRootAPI.connect()
         return {
             path: services
             for path, services in proxy.GetManagedObjects().items()
@@ -116,7 +120,7 @@ class AdvertisingManager:
             for path, hci in self.get_all_hci().items()
         ]
 
-    def get_hci_path(self, hci_address: str) -> Optional[str]:
+    def get_hci_path(self, hci_address: str) -> Optional[ObjPath]:
         for path, hci in self.get_all_hci().items():
             if hci["org.bluez.Adapter1"]["Address"].unpack() == hci_address:
                 return path

@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, List, cast
 
+from dasbus.typing import ObjPath
+
 from ancs4linux.common.dbus import Str, SystemBus, UInt32
 
 Signal = Any
@@ -27,12 +29,15 @@ class ShowNotificationData:
 
 
 class ObserverAPI(ABC):
+    interface = "ancs4linux.Observer"
+    path = ObjPath("/")
+
     def register(self) -> None:
-        SystemBus().publish_object("/", self)
+        SystemBus().publish_object(self.path, self)
 
     @classmethod
     def connect(cls, observer_dbus: str) -> "ObserverAPI":
-        return cast(ObserverAPI, SystemBus().get_proxy(observer_dbus, "/"))
+        return cast(ObserverAPI, SystemBus().get_proxy(observer_dbus, cls.path))
 
     def emit_show_notification(self, data: ShowNotificationData) -> None:
         self.ShowNotification(data.json())
@@ -46,12 +51,15 @@ class ObserverAPI(ABC):
 
 
 class AdvertisingAPI(ABC):
+    interface = "ancs4linux.Advertising"
+    path = ObjPath("/")
+
     def register(self) -> None:
-        SystemBus().publish_object("/", self)
+        SystemBus().publish_object(self.path, self)
 
     @classmethod
     def connect(cls, advertising_dbus: str) -> "AdvertisingAPI":
-        return cast(AdvertisingAPI, SystemBus().get_proxy(advertising_dbus, "/"))
+        return cast(AdvertisingAPI, SystemBus().get_proxy(advertising_dbus, cls.path))
 
     @abstractmethod
     def GetAllHci(self) -> List[Str]:

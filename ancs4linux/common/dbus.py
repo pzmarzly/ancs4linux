@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Type, cast
+from typing import Any, Optional, Type, cast
 
 from dasbus.connection import (  # type: ignore # missing
     SessionMessageBus,
@@ -43,12 +43,26 @@ class PairingRejected(DBusError):
     pass
 
 
-def SystemBus() -> SystemMessageBus:
-    return SystemMessageBus(error_mapper=error_mapper)
+class MessageBus(ABC):
+    @abstractmethod
+    def publish_object(self, address: ObjPath, object: Any) -> None:
+        pass
+
+    @abstractmethod
+    def register_service(self, name: Str) -> None:
+        pass
+
+    @abstractmethod
+    def get_proxy(self, name: Str, address: ObjPath) -> Any:
+        pass
 
 
-def SessionBus() -> SessionMessageBus:
-    return SessionMessageBus(error_mapper=error_mapper)
+def SystemBus() -> MessageBus:
+    return cast(MessageBus, SystemMessageBus(error_mapper=error_mapper))
+
+
+def SessionBus() -> MessageBus:
+    return cast(MessageBus, SessionMessageBus(error_mapper=error_mapper))
 
 
 def get_dbus_error_name(ex: Exception) -> Optional[str]:

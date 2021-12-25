@@ -6,7 +6,7 @@ from ancs4linux.common.apis import AdvertisingAPI
 from ancs4linux.common.dbus import Str, dbus_interface, dbus_signal
 
 
-@dbus_interface("ancs4linux.Advertising")
+@dbus_interface(AdvertisingAPI.interface)
 class AdvertisingServer(AdvertisingAPI):
     def __init__(
         self, pairing_manager: PairingManager, advertising_manager: AdvertisingManager

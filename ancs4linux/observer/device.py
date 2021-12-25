@@ -1,8 +1,8 @@
 from typing import Optional
 
 from ancs4linux.common.apis import ObserverAPI
-from ancs4linux.common.dbus import get_dbus_error_name
-from ancs4linux.common.external_apis import GattCharacteristicAPI
+from ancs4linux.common.dbus import ObjPath, get_dbus_error_name
+from ancs4linux.common.external_apis import BluezGattCharacteristicAPI
 from ancs4linux.common.task_restarter import TaskRestarter
 from ancs4linux.observer.device_comm import DeviceCommunicator
 
@@ -16,23 +16,23 @@ class MobileDevice:
         self.paired = False
         self.connected = False
         self.name: Optional[str] = None
-        self.notification_source: Optional[GattCharacteristicAPI] = None
-        self.control_point: Optional[GattCharacteristicAPI] = None
-        self.data_source: Optional[GattCharacteristicAPI] = None
+        self.notification_source: Optional[BluezGattCharacteristicAPI] = None
+        self.control_point: Optional[BluezGattCharacteristicAPI] = None
+        self.data_source: Optional[BluezGattCharacteristicAPI] = None
 
-    def set_notification_source(self, path: str) -> None:
+    def set_notification_source(self, path: ObjPath) -> None:
         self.unsubscribe()
-        self.notification_source = GattCharacteristicAPI.connect(path)
+        self.notification_source = BluezGattCharacteristicAPI.connect(path)
         self.try_subscribe()
 
-    def set_control_point(self, path: str) -> None:
+    def set_control_point(self, path: ObjPath) -> None:
         self.unsubscribe()
-        self.control_point = GattCharacteristicAPI.connect(path)
+        self.control_point = BluezGattCharacteristicAPI.connect(path)
         self.try_subscribe()
 
-    def set_data_source(self, path: str) -> None:
+    def set_data_source(self, path: ObjPath) -> None:
         self.unsubscribe()
-        self.data_source = GattCharacteristicAPI.connect(path)
+        self.data_source = BluezGattCharacteristicAPI.connect(path)
         self.try_subscribe()
 
     def set_paired(self, paired: bool) -> None:

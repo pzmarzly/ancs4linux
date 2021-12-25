@@ -13,7 +13,7 @@ from ancs4linux.common.dbus import (
 
 
 class PropertiesAPI(ABC):
-    INTERFACE = "org.freedesktop.DBus.Properties"
+    interface = "org.freedesktop.DBus.Properties"
 
     @abstractmethod
     def Get(self, interface: Str, name: Str) -> Variant:
@@ -31,7 +31,7 @@ class PropertiesAPI(ABC):
 
 
 class ObjectManagerAPI(ABC):
-    INTERFACE = "org.freedesktop.DBus.ObjectManager"
+    interface = "org.freedesktop.DBus.ObjectManager"
 
     @abstractmethod
     def GetManagedObjects(self) -> Dict[ObjPath, Dict[Str, Dict[Str, Variant]]]:
@@ -45,16 +45,13 @@ class ObjectManagerAPI(ABC):
 class NotificationAPI(ABC):
     """https://specifications.freedesktop.org/notification-spec/notification-spec-latest.html"""
 
-    INTERFACE = "org.freedesktop.Notifications"
+    NAME = "org.freedesktop.Notifications"
+    interface = "org.freedesktop.Notifications"
+    path = ObjPath("/org/freedesktop/Notifications")
 
     @classmethod
     def connect(cls) -> "NotificationAPI":
-        return cast(
-            NotificationAPI,
-            SessionBus().get_proxy(
-                "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
-            ),
-        )
+        return cast(NotificationAPI, SessionBus().get_proxy(cls.NAME, cls.path))
 
     @abstractmethod
     def Notify(
@@ -75,30 +72,57 @@ class NotificationAPI(ABC):
         pass
 
 
-class BluezRoot(ObjectManagerAPI, ABC):
+class BluezRootAPI(ObjectManagerAPI, ABC):
+    NAME = "org.bluez"
+    path = ObjPath("/")
+
     @classmethod
-    def connect(cls) -> "BluezRoot":
-        return cast(BluezRoot, SystemBus().get_proxy("org.bluez", "/"))
+    def connect(cls) -> "BluezRootAPI":
+        return cast(BluezRootAPI, SystemBus().get_proxy(cls.NAME, cls.path))
+
+
+class BluezAgentManagerAPI(ABC):
+    NAME = "org.bluez"
+    interface = "org.bluez.AgentManager1"
+    path = ObjPath("/org/bluez")
+
+    @classmethod
+    def connect(cls) -> "BluezAgentManagerAPI":
+        return cast(BluezAgentManagerAPI, SystemBus().get_proxy(cls.NAME, cls.path))
+
+    @abstractmethod
+    def RegisterAgent(self, agent: ObjPath, capability: Str) -> None:
+        pass
+
+    @abstractmethod
+    def RequestDefaultAgent(self, agent: ObjPath) -> None:
+        pass
+
+    @abstractmethod
+    def UnregisterAgent(self, agent: ObjPath) -> None:
+        pass
 
 
 class BluezDeviceAPI(PropertiesAPI, ABC):
-    INTERFACE = "org.bluez.Device1"
+    NAME = "org.bluez"
+    interface = "org.bluez.Device1"
 
     @classmethod
-    def connect(cls, path: str) -> "BluezDeviceAPI":
-        return cast(BluezDeviceAPI, SystemBus().get_proxy("org.bluez", path))
+    def connect(cls, path: ObjPath) -> "BluezDeviceAPI":
+        return cast(BluezDeviceAPI, SystemBus().get_proxy(cls.NAME, path))
 
     @abstractmethod
     def Connect(self) -> None:
         pass
 
 
-class GattCharacteristicAPI(PropertiesAPI, ABC):
-    INTERFACE = "org.bluez.GattCharacteristic1"
+class BluezGattCharacteristicAPI(PropertiesAPI, ABC):
+    NAME = "org.bluez"
+    interface = "org.bluez.GattCharacteristic1"
 
     @classmethod
-    def connect(cls, path: str) -> "GattCharacteristicAPI":
-        return cast(GattCharacteristicAPI, SystemBus().get_proxy("org.bluez", path))
+    def connect(cls, path: ObjPath) -> "BluezGattCharacteristicAPI":
+        return cast(BluezGattCharacteristicAPI, SystemBus().get_proxy(cls.NAME, path))
 
     @abstractmethod
     def ReadValue(self, options: Dict[Str, Variant]) -> List[int]:

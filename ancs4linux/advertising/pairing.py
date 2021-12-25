@@ -1,5 +1,3 @@
-from typing import Any
-
 from ancs4linux.common.apis import AdvertisingAPI
 from ancs4linux.common.dbus import (
     ObjPath,
@@ -10,6 +8,7 @@ from ancs4linux.common.dbus import (
     UInt32,
     dbus_interface,
 )
+from ancs4linux.common.external_apis import BluezAgentManagerAPI
 
 
 @dbus_interface("org.bluez.Agent1")
@@ -46,20 +45,22 @@ class PairingAgent:
 
 
 class PairingManager:
+    ADDRESS = ObjPath("/pairing_agent")
+
     def __init__(self):
         self.enabled = False
         self.enabled_automatically = False
-        self.agent_manager: Any = SystemBus().get_proxy("org.bluez", "/org/bluez")
+        self.agent_manager = BluezAgentManagerAPI.connect()
 
     def register(self, server: AdvertisingAPI) -> None:
-        SystemBus().publish_object("/pairing_agent", PairingAgent(server))
+        SystemBus().publish_object(self.ADDRESS, PairingAgent(server))
 
     def enable(self) -> None:
         if self.enabled:
             return
 
-        self.agent_manager.RegisterAgent("/pairing_agent", "DisplayYesNo")
-        self.agent_manager.RequestDefaultAgent("/pairing_agent")
+        self.agent_manager.RegisterAgent(self.ADDRESS, "DisplayYesNo")
+        self.agent_manager.RequestDefaultAgent(self.ADDRESS)
         self.enabled = True
         self.enabled_automatically = False
 
@@ -67,7 +68,7 @@ class PairingManager:
         if not self.enabled:
             return
 
-        self.agent_manager.UnregisterAgent("/pairing_agent")
+        self.agent_manager.UnregisterAgent(self.ADDRESS)
         self.enabled = False
         self.enabled_automatically = False
 
