@@ -39,8 +39,8 @@ class ObserverAPI(ABC):
 
     ShowNotification: Signal
 
-    def dismiss_notification(self, id: UInt32) -> None:
-        self.DismissNotification(id)
+    def dismiss_notification(self, id: int) -> None:
+        self.DismissNotification(UInt32(id))
 
     DismissNotification: Signal
 
