@@ -161,6 +161,7 @@ class MobileDevice:
         body_bytes, msg = msg[:body_size], msg[body_size:]
         body = body_bytes.decode("utf8", errors="replace")
 
+        assert self.name
         self.queue_notification(
             ShowNotificationData(
                 device_address=self.path,
