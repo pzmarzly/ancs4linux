@@ -91,6 +91,7 @@ class DeviceCommunicator:
         self.known_app_names[attrs.app_id] = attrs.app_name
         if attrs.app_id in self.awaiting_app_names:
             self.awaiting_app_names.remove(attrs.app_id)
+        self.process_queue()
 
     def queue_notification(self, data: ShowNotificationData) -> None:
         self.notification_queue.append(data)
