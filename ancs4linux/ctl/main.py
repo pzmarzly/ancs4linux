@@ -27,8 +27,20 @@ def enable_advertising(
 def disable_advertising(
     hci_address: str = typer.Option(..., help="Address of device to advertise on"),
 ) -> None:
-    """Disable advertising and pairing."""
+    """Disable advertising and, if enabled automatically, pairing."""
     advertising_api.DisableAdvertising(hci_address)
+
+
+@app.command()
+def enable_pairing() -> None:
+    """Enable just pairing."""
+    advertising_api.EnablePairing()
+
+
+@app.command()
+def disable_pairing() -> None:
+    """Disable just pairing."""
+    advertising_api.DisablePairing()
 
 
 @app.callback()
