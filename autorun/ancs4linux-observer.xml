@@ -3,9 +3,11 @@
 <busconfig>
   <policy user="root">
     <allow own="ancs4linux.Observer"/>
+    <allow send_destination="ancs4linux.Observer"/>
+    <allow receive_sender="ancs4linux.Observer"/>
   </policy>
 
-  <policy context="default">
+  <policy group="ancs4linux">
     <allow send_destination="ancs4linux.Observer"/>
     <allow receive_sender="ancs4linux.Observer"/>
   </policy>

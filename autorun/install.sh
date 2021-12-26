@@ -7,6 +7,10 @@ if [ "$(whoami)" != "root" ]; then
     exit 1
 fi
 
+groupadd -f ancs4linux
+USER=${SUDO_USER:-root}
+usermod -a -G ancs4linux "$USER"
+
 cd "$(dirname "$0")"
 
 install -m 644 ancs4linux-observer.service /usr/lib/systemd/system/ancs4linux-observer.service

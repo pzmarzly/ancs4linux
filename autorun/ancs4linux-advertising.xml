@@ -3,9 +3,11 @@
 <busconfig>
   <policy user="root">
     <allow own="ancs4linux.Advertising"/>
+    <allow send_destination="ancs4linux.Advertising"/>
+    <allow receive_sender="ancs4linux.Advertising"/>
   </policy>
 
-  <policy context="default">
+  <policy group="ancs4linux">
     <allow send_destination="ancs4linux.Advertising"/>
     <allow receive_sender="ancs4linux.Advertising"/>
   </policy>
