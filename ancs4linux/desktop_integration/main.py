@@ -1,4 +1,5 @@
 from typing import Dict, Optional
+import logging
 
 import typer
 
@@ -10,6 +11,7 @@ from ancs4linux.common.apis import (
 from ancs4linux.common.external_apis import NotificationAPI
 from ancs4linux.common.dbus import EventLoop, Int32, UInt32
 
+log = logging.getLogger(__name__)
 app = typer.Typer()
 notification_api: NotificationAPI
 advertising_api: AdvertisingAPI
@@ -41,12 +43,12 @@ class Notification:
             [],
             Int32(notification_timeout),
         )
-        print(f"Shown {self.host_id} from {data.app_name}.")
+        log.debug(f"Shown {self.host_id} from {data.app_name}.")
 
     def dismiss(self) -> None:
         if self.host_id != 0:
             notification_api.CloseNotification(UInt32(self.host_id))
-            print(f"Hidden {self.host_id}.")
+            log.debug(f"Hidden {self.host_id}.")
             self.host_id = 0
 
     def on_action(self, action: str) -> None:
@@ -107,6 +109,7 @@ def main(
         5000, help="How long to show notifications for"
     ),
 ) -> None:
+    logging.basicConfig(level=logging.DEBUG)
     loop = EventLoop()
 
     global notification_timeout
@@ -123,5 +126,5 @@ def main(
     observer_api.ShowNotification.connect(new_notification)
     observer_api.DismissNotification.connect(dismiss_notification)
 
-    print("Listening to notifications...")
+    log.info("Listening to notifications...")
     loop.run()

@@ -1,10 +1,13 @@
 from typing import Optional
+import logging
 
 from ancs4linux.common.apis import ObserverAPI
 from ancs4linux.common.dbus import ObjPath, get_dbus_error_name
 from ancs4linux.common.external_apis import BluezGattCharacteristicAPI
 from ancs4linux.common.task_restarter import TaskRestarter
 from ancs4linux.observer.device_comm import DeviceCommunicator
+
+log = logging.getLogger(__name__)
 
 
 class MobileDevice:
@@ -54,7 +57,9 @@ class MobileDevice:
         self.communicator = None
 
     def try_subscribe(self) -> None:
-        print(f"{self.path}: {self.paired} {self.connected} {not self.communicator}")
+        log.debug(
+            f"{self.path}: {self.paired} {self.connected} {not self.communicator}"
+        )
         if not (
             self.paired
             and self.connected
@@ -66,13 +71,13 @@ class MobileDevice:
         ):
             return
 
-        print("Asking for notifications...")
+        log.info("Asking for notifications...")
         TaskRestarter(
             120,
             1,
             self.try_asking,
-            lambda: print("Asking for notifications: success."),
-            lambda: print("Failed to subscribe to notifications."),
+            lambda: log.info("Asking for notifications: success."),
+            lambda: log.error("Failed to subscribe to notifications."),
         ).try_running_bg()
 
     def try_asking(self) -> bool:
@@ -83,9 +88,11 @@ class MobileDevice:
             self.data_source.StartNotify()
             self.notification_source.StartNotify()
         except Exception as e:
-            print(f"Failed to start subscribe to notifications (is phone paired?): {e}")
+            log.warn(
+                f"Failed to start subscribe to notifications (is phone paired?): {e}"
+            )
             if get_dbus_error_name(e) is not None:
-                print(f"Original error: {get_dbus_error_name(e)}")
+                log.warn(f"Original error: {get_dbus_error_name(e)}")
             return False
 
         comm = DeviceCommunicator(self)

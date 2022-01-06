@@ -1,10 +1,12 @@
 import typer
+import logging
 
 from ancs4linux.advertising.advertisement import AdvertisingManager
 from ancs4linux.advertising.pairing import PairingManager
 from ancs4linux.advertising.server import AdvertisingServer
 from ancs4linux.common.dbus import EventLoop, SystemBus
 
+log = logging.getLogger(__name__)
 app = typer.Typer()
 
 
@@ -12,6 +14,7 @@ app = typer.Typer()
 def main(
     advertising_dbus: str = typer.Option("ancs4linux.Advertising", help="Service path")
 ) -> None:
+    logging.basicConfig(level=logging.DEBUG)
     loop = EventLoop()
 
     pairing_manager = PairingManager()
@@ -22,5 +25,5 @@ def main(
     server.register()
     SystemBus().register_service(advertising_dbus)
 
-    print("Ready to advertise...")
+    log.info("Ready to advertise...")
     loop.run()
