@@ -54,6 +54,7 @@ class MobileDevice:
         self.communicator = None
 
     def try_subscribe(self) -> None:
+        print(f"{self.path}: {self.paired} {self.connected} {not self.communicator}")
         if not (
             self.paired
             and self.connected
