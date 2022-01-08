@@ -9,8 +9,8 @@ jobs:
       with:
         python-version: "3.7"
         architecture: x64
-    - run: apt-get update
-    - run: apt-get install -y libgirepository1.0-dev
+    - run: sudo apt-get update
+    - run: sudo apt-get install -y libgirepository1.0-dev
     - uses: actions/checkout@v2
     - name: Install Poetry
       run: |
@@ -41,8 +41,8 @@ jobs:
       with:
         python-version: "3.7"
         architecture: x64
-    - run: apt-get update
-    - run: apt-get install -y libgirepository1.0-dev
+    - run: sudo apt-get update
+    - run: sudo apt-get install -y libgirepository1.0-dev
     - uses: actions/checkout@v2
     - run: pip3 install .
     - run: ancs4linux-advertising --help
