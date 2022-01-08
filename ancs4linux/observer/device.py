@@ -1,5 +1,5 @@
-from typing import Optional
 import logging
+from typing import Optional
 
 from ancs4linux.common.apis import ObserverAPI
 from ancs4linux.common.dbus import ObjPath, get_dbus_error_name

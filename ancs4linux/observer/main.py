@@ -1,5 +1,6 @@
-import typer
 import logging
+
+import typer
 
 from ancs4linux.common.dbus import EventLoop, SystemBus
 from ancs4linux.observer.scanner import Scanner

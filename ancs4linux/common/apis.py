@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional, cast
 
-from ancs4linux.common.dbus import Signal, Bool, ObjPath, Str, SystemBus, UInt32
+from ancs4linux.common.dbus import Bool, ObjPath, Signal, Str, SystemBus, UInt32
 
 
 @dataclass

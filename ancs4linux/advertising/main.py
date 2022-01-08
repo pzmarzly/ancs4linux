@@ -1,5 +1,6 @@
-import typer
 import logging
+
+import typer
 
 from ancs4linux.advertising.advertisement import AdvertisingManager
 from ancs4linux.advertising.pairing import PairingManager

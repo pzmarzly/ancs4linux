@@ -2,10 +2,10 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, cast
 
 from ancs4linux.common.dbus import (
-    Signal,
-    ObjPath,
     Int32,
+    ObjPath,
     SessionBus,
+    Signal,
     Str,
     SystemBus,
     UInt32,

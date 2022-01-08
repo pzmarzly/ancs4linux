@@ -3,9 +3,9 @@ from typing import Any, Dict, List, Optional
 
 from ancs4linux.advertising.pairing import PairingManager
 from ancs4linux.common.dbus import (
-    ObjPath,
     Bool,
     Byte,
+    ObjPath,
     Str,
     SystemBus,
     UInt16,

@@ -2,13 +2,12 @@ from functools import partial
 from typing import Dict, List
 
 from ancs4linux.common.apis import ObserverAPI
-from ancs4linux.common.dbus import Variant, ObjPath, Str
+from ancs4linux.common.dbus import ObjPath, Str, Variant
 from ancs4linux.common.external_apis import (
-    BluezRootAPI,
     BluezDeviceAPI,
     BluezGattCharacteristicAPI,
+    BluezRootAPI,
 )
-from ancs4linux.common.task_restarter import TaskRestarter
 from ancs4linux.observer.ancs.constants import (
     ANCS_CHARS,
     CONTROL_POINT_CHAR,

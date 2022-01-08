@@ -1,15 +1,11 @@
-from typing import Dict, Optional
 import logging
+from typing import Dict, Optional
 
 import typer
 
-from ancs4linux.common.apis import (
-    AdvertisingAPI,
-    ObserverAPI,
-    ShowNotificationData,
-)
-from ancs4linux.common.external_apis import NotificationAPI
+from ancs4linux.common.apis import AdvertisingAPI, ObserverAPI, ShowNotificationData
 from ancs4linux.common.dbus import EventLoop, Int32, UInt32
+from ancs4linux.common.external_apis import NotificationAPI
 
 log = logging.getLogger(__name__)
 app = typer.Typer()
