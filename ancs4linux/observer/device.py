@@ -14,7 +14,7 @@ class MobileDevice:
     def __init__(self, path: str, server: ObserverAPI):
         self.server = server
         self.path = path
-        self.communicator = None
+        self.communicator: Optional[DeviceCommunicator] = None
 
         self.paired = False
         self.connected = False

@@ -19,7 +19,8 @@ def main(
 
     server = ObserverServer()
     scanner = Scanner(server)
-    server.register(scanner)
+    server.set_scanner(scanner)
+    server.register()
     SystemBus().register_service(observer_dbus)
 
     log.info("Observing devices...")

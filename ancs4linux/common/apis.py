@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List, Optional, cast
 
-from ancs4linux.common.dbus import Bool, ObjPath, Signal, Str, SystemBus, UInt32
+from ancs4linux.common.dbus import Bool, ObjPath, Signal, Str, SystemBus, UInt16, UInt32
 
 
 @dataclass
@@ -89,3 +89,44 @@ class AdvertisingAPI(ABC):
         self.PairingCode(pin)
 
     PairingCode: Signal
+
+
+class PairingAgentAPI(ABC):
+    interface = "org.bluez.Agent1"
+    path = ObjPath("/pairing_agent")
+
+    @abstractmethod
+    def Release(self) -> None:
+        pass
+
+    @abstractmethod
+    def RequestPinCode(self, device: ObjPath) -> Str:
+        pass
+
+    @abstractmethod
+    def DisplayPinCode(self, device: ObjPath, pincode: Str) -> None:
+        pass
+
+    @abstractmethod
+    def RequestPassKey(self, device: ObjPath) -> UInt32:
+        pass
+
+    @abstractmethod
+    def DisplayPasskey(self, device: ObjPath, passkey: UInt32, entered: UInt16) -> None:
+        pass
+
+    @abstractmethod
+    def RequestConfirmation(self, device: ObjPath, passkey: UInt32) -> None:
+        pass
+
+    @abstractmethod
+    def RequestAuthorization(self, device: ObjPath) -> None:
+        pass
+
+    @abstractmethod
+    def AuthorizeService(self, device: ObjPath, uuid: Str) -> None:
+        pass
+
+    @abstractmethod
+    def Cancel(self) -> None:
+        pass

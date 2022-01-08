@@ -1,4 +1,4 @@
-from ancs4linux.common.apis import AdvertisingAPI
+from ancs4linux.common.apis import AdvertisingAPI, PairingAgentAPI
 from ancs4linux.common.dbus import (
     ObjPath,
     PairingRejected,
@@ -11,7 +11,7 @@ from ancs4linux.common.dbus import (
 from ancs4linux.common.external_apis import BluezAgentManagerAPI
 
 
-@dbus_interface("org.bluez.Agent1")
+@dbus_interface(PairingAgentAPI.interface)
 class PairingAgent:
     def __init__(self, server: AdvertisingAPI):
         self.server = server
@@ -45,22 +45,20 @@ class PairingAgent:
 
 
 class PairingManager:
-    ADDRESS = ObjPath("/pairing_agent")
-
     def __init__(self):
         self.enabled = False
         self.enabled_automatically = False
         self.agent_manager = BluezAgentManagerAPI.connect()
 
     def register(self, server: AdvertisingAPI) -> None:
-        SystemBus().publish_object(self.ADDRESS, PairingAgent(server))
+        SystemBus().publish_object(PairingAgentAPI.path, PairingAgent(server))
 
     def enable(self) -> None:
         if self.enabled:
             return
 
-        self.agent_manager.RegisterAgent(self.ADDRESS, "DisplayYesNo")
-        self.agent_manager.RequestDefaultAgent(self.ADDRESS)
+        self.agent_manager.RegisterAgent(PairingAgentAPI.path, "DisplayYesNo")
+        self.agent_manager.RequestDefaultAgent(PairingAgentAPI.path)
         self.enabled = True
         self.enabled_automatically = False
 
@@ -68,7 +66,7 @@ class PairingManager:
         if not self.enabled:
             return
 
-        self.agent_manager.UnregisterAgent(self.ADDRESS)
+        self.agent_manager.UnregisterAgent(PairingAgentAPI.path)
         self.enabled = False
         self.enabled_automatically = False
 

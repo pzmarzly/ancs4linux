@@ -5,9 +5,8 @@ from ancs4linux.observer.scanner import Scanner
 
 @dbus_interface(ObserverAPI.interface)
 class ObserverServer(ObserverAPI):
-    def register(self, scanner: Scanner) -> None:
+    def set_scanner(self, scanner: Scanner) -> None:
         self.scanner = scanner
-        super().register()
 
     def InvokeDeviceAction(
         self, device_handle: Str, notification_id: UInt32, is_positive: Bool
