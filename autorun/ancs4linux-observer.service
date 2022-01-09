@@ -1,6 +1,7 @@
 [Unit]
 Description=ancs4linux Observer daemon
 Requires=bluetooth.service
+After=bluetooth.service
 
 [Service]
 Type=dbus
