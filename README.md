@@ -13,7 +13,7 @@ It uses Apple Notification Center Service (ANCS) - the same protocol that smartw
 The project consists of many daemons meant to be running in background. For Ubuntu 20.04:
 
 ```bash
-apt-get install -y libgirepository1.0-dev
+sudo apt-get install -y libgirepository1.0-dev
 git clone https://github.com/pzmarzly/ancs4linux
 sudo ./ancs4linux/autorun/install.sh
 systemctl --user daemon-reload
