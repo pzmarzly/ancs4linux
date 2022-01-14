@@ -46,13 +46,13 @@ class ObjectManagerAPI(ABC):
 class NotificationAPI(ABC):
     """https://specifications.freedesktop.org/notification-spec/notification-spec-latest.html"""
 
-    NAME = "org.freedesktop.Notifications"
+    name = "org.freedesktop.Notifications"
     interface = "org.freedesktop.Notifications"
     path = ObjPath("/org/freedesktop/Notifications")
 
     @classmethod
     def connect(cls) -> "NotificationAPI":
-        return cast(NotificationAPI, SessionBus().get_proxy(cls.NAME, cls.path))
+        return cast(NotificationAPI, SessionBus().get_proxy(cls.name, cls.path))
 
     @abstractmethod
     def Notify(
@@ -78,22 +78,22 @@ class NotificationAPI(ABC):
 
 
 class BluezRootAPI(ObjectManagerAPI, ABC):
-    NAME = "org.bluez"
+    name = "org.bluez"
     path = ObjPath("/")
 
     @classmethod
     def connect(cls) -> "BluezRootAPI":
-        return cast(BluezRootAPI, SystemBus().get_proxy(cls.NAME, cls.path))
+        return cast(BluezRootAPI, SystemBus().get_proxy(cls.name, cls.path))
 
 
 class BluezAgentManagerAPI(ABC):
-    NAME = "org.bluez"
+    name = "org.bluez"
     interface = "org.bluez.AgentManager1"
     path = ObjPath("/org/bluez")
 
     @classmethod
     def connect(cls) -> "BluezAgentManagerAPI":
-        return cast(BluezAgentManagerAPI, SystemBus().get_proxy(cls.NAME, cls.path))
+        return cast(BluezAgentManagerAPI, SystemBus().get_proxy(cls.name, cls.path))
 
     @abstractmethod
     def RegisterAgent(self, agent: ObjPath, capability: Str) -> None:
@@ -109,12 +109,12 @@ class BluezAgentManagerAPI(ABC):
 
 
 class BluezDeviceAPI(PropertiesAPI, ABC):
-    NAME = "org.bluez"
+    name = "org.bluez"
     interface = "org.bluez.Device1"
 
     @classmethod
     def connect(cls, path: ObjPath) -> "BluezDeviceAPI":
-        return cast(BluezDeviceAPI, SystemBus().get_proxy(cls.NAME, path))
+        return cast(BluezDeviceAPI, SystemBus().get_proxy(cls.name, path))
 
     @abstractmethod
     def Connect(self) -> None:
@@ -122,12 +122,12 @@ class BluezDeviceAPI(PropertiesAPI, ABC):
 
 
 class BluezGattCharacteristicAPI(PropertiesAPI, ABC):
-    NAME = "org.bluez"
+    name = "org.bluez"
     interface = "org.bluez.GattCharacteristic1"
 
     @classmethod
     def connect(cls, path: ObjPath) -> "BluezGattCharacteristicAPI":
-        return cast(BluezGattCharacteristicAPI, SystemBus().get_proxy(cls.NAME, path))
+        return cast(BluezGattCharacteristicAPI, SystemBus().get_proxy(cls.name, path))
 
     @abstractmethod
     def ReadValue(self, options: Dict[Str, Variant]) -> List[int]:
