@@ -1,7 +1,5 @@
 # ANCS4Linux
 
-Disclaimer: this project is a part of my Bachelor's thesis. Please don't send Pull Requests yet.
-
 > iOS & iPadOS notification service client for GNU/Linux
 
 This project lets you receive iOS and iPadOS notifications on your Linux desktop/laptop. No jailbreak needed.
@@ -43,6 +41,6 @@ If you want to do some scripting, you can observe ancs4linux DBus APIs. [How to]
 - ForwardNotifier - jailbreak required
 - Dell Mobile Connect - Windows 10 required
 
-## Social
+## Backlinks
 
 - [original Reddit announcement](https://www.reddit.com/r/linux/comments/gks3bt/ios_notifications_on_linux_desktop_over_bluetooth/)
