@@ -6,7 +6,7 @@ After=bluetooth.service
 [Service]
 Type=dbus
 BusName=ancs4linux.Advertising
-ExecStart=/usr/local/bin/ancs4linux-advertising
+ExecStart=/usr/bin/ancs4linux-advertising
 
 [Install]
 WantedBy=default.target
