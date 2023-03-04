@@ -5,7 +5,7 @@ After=bluetooth.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/ancs4linux-desktop-integration
+ExecStart=/usr/bin/ancs4linux-desktop-integration
 
 [Install]
 WantedBy=default.target
