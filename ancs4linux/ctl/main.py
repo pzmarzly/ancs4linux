@@ -2,10 +2,17 @@ import json
 
 import typer
 
-from ancs4linux.common.apis import AdvertisingAPI
+from ancs4linux.common.apis import AdvertisingAPI, ObserverAPI
 
 advertising_api: AdvertisingAPI
+observer_api: ObserverAPI
 app = typer.Typer()
+
+
+@app.command()
+def get_active() -> None:
+    """Get active devices and their retrieved notifications."""
+    print(json.dumps(json.loads(observer_api.GetActive()), indent=4))
 
 
 @app.command()
@@ -46,9 +53,13 @@ def disable_pairing() -> None:
 @app.callback()
 def main(
     advertising_dbus: str = typer.Option(
-        "ancs4linux.Advertising", help="Advertising servive path"
-    )
+        "ancs4linux.Advertising", help="Advertising service path"
+    ),
+    observer_dbus: str = typer.Option(
+        "ancs4linux.Observer", help="Observer service path"
+    ),
 ) -> None:
     """Issue commands to ancs4linux servers running in background."""
-    global advertising_api
+    global advertising_api, observer_api
     advertising_api = AdvertisingAPI.connect(advertising_dbus)
+    observer_api = ObserverAPI.connect(observer_dbus)

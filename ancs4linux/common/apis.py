@@ -18,8 +18,11 @@ class ShowNotificationData:
     positive_action: Optional[str]
     negative_action: Optional[str]
 
+    def to_dict(self) -> dict:
+        return vars(self)
+
     def json(self) -> str:
-        return json.dumps(vars(self))
+        return json.dumps(self.to_dict())
 
     @classmethod
     def parse(cls, data: str) -> "ShowNotificationData":
@@ -36,6 +39,10 @@ class ObserverAPI(ABC):
     @classmethod
     def connect(cls, observer_dbus: str) -> "ObserverAPI":
         return cast(ObserverAPI, SystemBus().get_proxy(observer_dbus, cls.path))
+
+    @abstractmethod
+    def GetActive(self) -> Str:
+        pass
 
     @abstractmethod
     def InvokeDeviceAction(
