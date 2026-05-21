@@ -34,6 +34,14 @@ systemctl --global enable ancs4linux-desktop-integration.service
 systemctl restart ancs4linux-observer.service
 systemctl restart ancs4linux-advertising.service
 
-# Run as user:
-# systemctl --user daemon-reload
-# systemctl --user restart ancs4linux-desktop-integration.service
+if [ -n "${SUDO_USER:-}" ]; then
+    sudo -u "$SUDO_USER" DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u "$SUDO_USER")/bus systemctl --user daemon-reload
+    sudo -u "$SUDO_USER" DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u "$SUDO_USER")/bus systemctl --user restart ancs4linux-desktop-integration.service
+fi
+
+echo "Verifying services..."
+systemctl is-active ancs4linux-observer.service
+systemctl is-active ancs4linux-advertising.service
+if [ -n "${SUDO_USER:-}" ]; then
+    sudo -u "$SUDO_USER" DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u "$SUDO_USER")/bus systemctl --user is-active ancs4linux-desktop-integration.service
+fi
