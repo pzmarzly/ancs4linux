@@ -1,3 +1,5 @@
+from typing import Any
+
 from ancs4linux.common.apis import AdvertisingAPI, PairingAgentAPI
 from ancs4linux.common.dbus import (
     ObjPath,
@@ -9,6 +11,7 @@ from ancs4linux.common.dbus import (
     dbus_interface,
 )
 from ancs4linux.common.external_apis import BluezAgentManagerAPI
+from ancs4linux.observer.ancs.constants import ANCS_SERVICE
 
 
 import logging
@@ -101,20 +104,53 @@ class PairingAgent:
         """
         Requested to authorize a connection.
 
+        Polite implementation: Automatically authorizes if the device supports
+        ANCS. Otherwise, only authorizes if pairing was explicitly enabled
+        by the user (not automatically).
+
         :param device: The device requesting authorization.
         """
         log.debug(f"RequestAuthorization for {device}")
-        pass
+        
+        # 1. Check if it's an ANCS device
+        try:
+            device_proxy: Any = SystemBus().get_proxy("org.bluez", device)
+            uuids = [str(u).upper() for u in device_proxy.UUIDs]
+            if ANCS_SERVICE.upper() in uuids:
+                log.info(f"PoliteAgent: Auto-authorizing ANCS device {device}")
+                return
+        except Exception as e:
+            log.debug(f"PoliteAgent: Could not check UUIDs for {device}: {e}")
+
+        # 2. If not ANCS, only authorize if we are in manual pairing mode
+        if not self.server.pairing_manager.enabled_automatically:
+            log.info(f"PoliteAgent: Manual authorization for {device}")
+            return
+
+        log.warning(f"PoliteAgent: Rejecting unknown device {device} to avoid interference")
+        raise PairingRejected
 
     def AuthorizeService(self, device: ObjPath, uuid: Str) -> None:
         """
         Requested to authorize a specific service.
 
+        Polite implementation: Automatically authorizes ANCS or if in manual mode.
+
         :param device: The device requesting authorization.
         :param uuid: The service UUID.
         """
         log.debug(f"AuthorizeService for {device}: {uuid}")
-        pass
+        
+        if uuid.upper() == ANCS_SERVICE.upper():
+            log.info(f"PoliteAgent: Authorizing ANCS service for {device}")
+            return
+
+        if not self.server.pairing_manager.enabled_automatically:
+            log.info(f"PoliteAgent: Manual service authorization for {uuid} on {device}")
+            return
+
+        log.warning(f"PoliteAgent: Rejecting service {uuid} for {device}")
+        raise PairingRejected
 
     def Cancel(self) -> None:
         """
@@ -147,15 +183,16 @@ class PairingManager:
 
     def enable(self) -> None:
         """
-        Registers the agent with BlueZ AgentManager.
+        Registers the agent with BlueZ AgentManager and requests default status.
 
-        Note: RequestDefaultAgent is deliberately omitted to avoid
-        interfering with other system agents (e.g., for HID devices).
+        Requesting default status is necessary for ANCS because iOS-initiated
+        pairing and security upgrades are routed to the default agent.
         """
         if self.enabled:
             return
 
         self.agent_manager.RegisterAgent(PairingAgentAPI.path, "DisplayYesNo")
+        self.agent_manager.RequestDefaultAgent(PairingAgentAPI.path)
         self.enabled = True
         self.enabled_automatically = False
 

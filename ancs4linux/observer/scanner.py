@@ -55,12 +55,15 @@ class Scanner:
                 self.property_observers[path].PropertiesChanged.connect(
                     partial(self.process_property, path)
                 )
-                self.process_property(
-                    path,
-                    BluezDeviceAPI.interface,
-                    services[BluezDeviceAPI.interface],
-                    [],
-                )
+            
+            # Ensure the device object exists before processing its initial properties
+            self.devices.setdefault(path, MobileDevice(path, self.server))
+            self.process_property(
+                path,
+                BluezDeviceAPI.interface,
+                services[BluezDeviceAPI.interface],
+                [],
+            )
 
         if BluezGattCharacteristicAPI.interface in services:
             uuid = services[BluezGattCharacteristicAPI.interface]["UUID"].unpack()
