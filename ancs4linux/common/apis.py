@@ -92,6 +92,10 @@ class AdvertisingAPI(ABC):
     def DisablePairing(self) -> None:
         pass
 
+    @abstractmethod
+    def GetStatus(self) -> Str:
+        pass
+
     def emit_pairing_code(self, pin: str) -> None:
         self.PairingCode(pin)
 
