@@ -25,6 +25,7 @@ class MobileDevice:
         self.notification_source: Optional[BluezGattCharacteristicAPI] = None
         self.control_point: Optional[BluezGattCharacteristicAPI] = None
         self.data_source: Optional[BluezGattCharacteristicAPI] = None
+        self.last_error: Optional[str] = None
 
     @property
     def is_ancs_supported(self) -> bool:
@@ -95,7 +96,9 @@ class MobileDevice:
             # Timeouts (timeout=1000 [ms]) do not work.
             self.data_source.StartNotify()
             self.notification_source.StartNotify()
+            self.last_error = None
         except Exception as e:
+            self.last_error = str(e)
             log.warn(
                 f"Failed to start subscribe to notifications (is phone paired?): {e}"
             )
