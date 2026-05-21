@@ -1,10 +1,11 @@
 import logging
-from typing import Optional
+from typing import List, Optional
 
-from ancs4linux.common.apis import ObserverAPI
+from ancs4linux.common.apis import ObserverAPI, ShowNotificationData
 from ancs4linux.common.dbus import ObjPath, get_dbus_error_name
 from ancs4linux.common.external_apis import BluezGattCharacteristicAPI
 from ancs4linux.common.task_restarter import TaskRestarter
+from ancs4linux.observer.ancs.constants import ANCS_SERVICE
 from ancs4linux.observer.device_comm import DeviceCommunicator
 
 log = logging.getLogger(__name__)
@@ -19,9 +20,16 @@ class MobileDevice:
         self.paired = False
         self.connected = False
         self.name: Optional[str] = None
+        self.uuids: List[str] = []
+        self.notification_history: List[ShowNotificationData] = []
         self.notification_source: Optional[BluezGattCharacteristicAPI] = None
         self.control_point: Optional[BluezGattCharacteristicAPI] = None
         self.data_source: Optional[BluezGattCharacteristicAPI] = None
+
+    @property
+    def is_ancs_supported(self) -> bool:
+        """Checks if the device claims to support the ANCS service."""
+        return ANCS_SERVICE in self.uuids
 
     def set_notification_source(self, path: ObjPath) -> None:
         self.unsubscribe()

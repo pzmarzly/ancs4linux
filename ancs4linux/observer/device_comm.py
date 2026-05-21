@@ -106,9 +106,11 @@ class DeviceCommunicator:
         unprocessed = []
         for data in self.notification_queue:
             if data.app_name != "":
+                self.device.notification_history.append(data)
                 self.device.server.emit_show_notification(data)
             elif data.app_id in self.known_app_names:
                 data.app_name = self.known_app_names[data.app_id]
+                self.device.notification_history.append(data)
                 self.device.server.emit_show_notification(data)
             elif data.app_id in self.awaiting_app_names:
                 unprocessed.append(data)
