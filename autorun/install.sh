@@ -19,11 +19,11 @@ install -m 644 ancs4linux-advertising.service /usr/lib/systemd/system/ancs4linux
 install -m 644 ancs4linux-advertising.xml /etc/dbus-1/system.d/ancs4linux-advertising.conf
 install -m 644 ancs4linux-desktop-integration.service /usr/lib/systemd/user/ancs4linux-desktop-integration.service
 
-set +e
-deactivate
-set -e
-cd ..
-pip3 install .
+mkdir -p /opt/ancs4linux
+python3 -m venv /opt/ancs4linux/venv
+/opt/ancs4linux/venv/bin/pip install ..
+
+ln -sf /opt/ancs4linux/venv/bin/ancs4linux-ctl /usr/local/bin/ancs4linux-ctl
 
 systemctl daemon-reload
 
