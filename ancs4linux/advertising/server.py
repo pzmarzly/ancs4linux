@@ -1,3 +1,4 @@
+import json
 from typing import List
 
 from ancs4linux.advertising.advertisement import AdvertisingManager
@@ -28,6 +29,16 @@ class AdvertisingServer(AdvertisingAPI):
 
     def DisablePairing(self) -> None:
         self.pairing_manager.disable()
+
+    def GetStatus(self) -> Str:
+        status = {
+            "pairing_enabled": self.pairing_manager.enabled,
+            "pairing_enabled_automatically": self.pairing_manager.enabled_automatically,
+            "active_advertisements": list(
+                self.advertising_manager.active_advertisements.keys()
+            ),
+        }
+        return json.dumps(status)
 
     @dbus_signal
     def PairingCode(self, pin: Str) -> None:

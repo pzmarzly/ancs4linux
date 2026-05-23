@@ -22,6 +22,7 @@ def main(
     advertising_manager = AdvertisingManager(pairing_manager)
     server = AdvertisingServer(pairing_manager, advertising_manager)
     pairing_manager.register(server)
+    pairing_manager.enable_automatically()
     advertising_manager.register()
     server.register()
     SystemBus().register_service(advertising_dbus)
