@@ -6,6 +6,8 @@ This project lets you receive iOS and iPadOS notifications on your Linux desktop
 
 It uses Apple Notification Center Service (ANCS) - the same protocol that smartwatches use. Bluetooth 4.0 (Low Energy) is required.
 
+**NOTE: I am no longer using this project. However, it should still work. PRs are welcome.**
+
 ## Running
 
 The project consists of many daemons meant to be running in background. For Ubuntu 20.04:
@@ -39,7 +41,7 @@ If you want to do some scripting, you can observe ancs4linux DBus APIs. [How to]
 
 - Pusher - jailbreak required
 - ForwardNotifier - jailbreak required
-- Dell Mobile Connect - Windows 10 required
+- Dell Mobile Connect - Windows 10/11 required
 
 ## Backlinks
 
