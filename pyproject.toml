@@ -1,31 +1,33 @@
-[tool.poetry]
+[project]
 name = "ancs4linux"
 version = "1.0.0"
 description = "Control your iOS device from Linux desktop"
-authors = ["Paweł Zmarzły <pawo2500@gmail.com>"]
+authors = [{ name = "Paweł Zmarzły", email = "pawo2500@gmail.com" }]
 license = "GPL-2.0-or-later"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "dasbus>=1.7,<2.0",
+    "PyGObject>=3.50,<4.0",
+    "typer>=0.12,<0.13",
+]
+
+[project.urls]
 repository = "https://github.com/pzmarzly/ancs4linux"
 
-[tool.poetry.scripts]
+[project.scripts]
 ancs4linux-advertising = 'ancs4linux.advertising.main:app'
 ancs4linux-desktop-integration = 'ancs4linux.desktop_integration.main:app'
 ancs4linux-ctl = 'ancs4linux.ctl.main:app'
 ancs4linux-observer = 'ancs4linux.observer.main:app'
 
-[tool.poetry.dependencies]
-python = "^3.7"
-dasbus = "^1.6"
-PyGObject = "^3.42.0"
-typer = "^0.4.0"
-
-[tool.poetry.dev-dependencies]
-mypy = "^0.910"
-black = "^21.9b0"
-isort = "^5.10.1"
-autoflake = "^1.4"
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.11"
+black = "^24.8"
+isort = "^5.13"
+autoflake = "^2.3"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.isort]

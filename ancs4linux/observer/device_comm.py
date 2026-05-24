@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 class DeviceCommunicator:
     def __init__(self, device: "MobileDevice"):
         self.device = device
-        self.id = random.randint(1, 10 ** 5) * 1000
+        self.id = random.randint(1, 10**5) * 1000
         self.notification_queue: List[ShowNotificationData] = []
         self.awaiting_app_names: Set[str] = set()
         self.known_app_names: Dict[str, str] = dict()

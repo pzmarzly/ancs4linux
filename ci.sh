@@ -3,6 +3,7 @@ set -eu
 
 python3 -m venv .venv
 source .venv/bin/activate
+poetry check --lock
 poetry install
 
 ancs4linux-advertising --help

@@ -1,7 +1,7 @@
 """ANCS revision 2014-10-20"""
 
-USHORT_MAX = (2 ** 16) - 1
-UINT_MAX = (2 ** 32) - 1
+USHORT_MAX = (2**16) - 1
+UINT_MAX = (2**32) - 1
 
 ANCS_SERVICE = "7905f431-b5ce-4e99-a40f-4b1e122d00d0"
 NOTIFICATION_SOURCE_CHAR = "9fbf120d-6301-42d9-8c58-25e699a21dbd"
