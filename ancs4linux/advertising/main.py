@@ -4,6 +4,7 @@ import typer
 
 from ancs4linux.advertising.advertisement import AdvertisingManager
 from ancs4linux.advertising.pairing import PairingManager
+from ancs4linux.advertising.reconnect import ReconnectAdvertiser
 from ancs4linux.advertising.server import AdvertisingServer
 from ancs4linux.common.dbus import EventLoop, SystemBus
 
@@ -23,6 +24,7 @@ def main(
     server = AdvertisingServer(pairing_manager, advertising_manager)
     pairing_manager.register(server)
     advertising_manager.register()
+    ReconnectAdvertiser().register()
     server.register()
     SystemBus().register_service(advertising_dbus)
 
