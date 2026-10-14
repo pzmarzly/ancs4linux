@@ -54,6 +54,12 @@ class MobileDevice:
         self.try_subscribe()
 
     def unsubscribe(self) -> None:
+        # A replaced proxy keeps its handlers, and the next communicator only
+        # clears the ones on the proxies it attaches to, so each resubscribe
+        # would deliver every notification once more.
+        for source in (self.notification_source, self.data_source):
+            if source is not None:
+                source.PropertiesChanged.disconnect()
         self.communicator = None
 
     def try_subscribe(self) -> None:
