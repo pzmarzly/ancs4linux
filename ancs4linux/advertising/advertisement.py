@@ -1,3 +1,4 @@
+import time
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
@@ -5,6 +6,7 @@ from ancs4linux.advertising.pairing import PairingManager
 from ancs4linux.common.dbus import (
     Bool,
     Byte,
+    DBusError,
     ObjPath,
     Str,
     SystemBus,
@@ -88,11 +90,25 @@ class HciState:
         )
 
     def restore_on(self, hci: Any) -> None:
-        hci.Powered = self.powered
+        set_mode(hci, "Powered", self.powered)
         hci.Alias = self.name
         if self.powered:
-            hci.Pairable = self.pairable
-            hci.Discoverable = self.discoverable
+            set_mode(hci, "Pairable", self.pairable)
+            set_mode(hci, "Discoverable", self.discoverable)
+
+
+def set_mode(hci: Any, name: str, value: bool) -> None:
+    """BlueZ fails a mode change with Busy while the controller is still
+    settling a pairing or a connection, which is exactly when pairing ends.
+    Giving up there leaves the adapter discoverable and pairable."""
+    for attempt in range(10):
+        try:
+            setattr(hci, name, value)
+            return
+        except DBusError as ex:
+            if str(ex) != "Busy" or attempt == 9:
+                raise
+            time.sleep(0.3)
 
 
 class AdvertisingManager:
