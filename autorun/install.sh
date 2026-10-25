@@ -29,7 +29,8 @@ systemctl daemon-reload
 
 systemctl enable ancs4linux-observer.service
 systemctl enable ancs4linux-advertising.service
-systemctl --global enable ancs4linux-desktop-integration.service
+# reenable drops the default.target.wants link left by older versions.
+systemctl --global reenable ancs4linux-desktop-integration.service
 
 systemctl restart ancs4linux-observer.service
 systemctl restart ancs4linux-advertising.service
