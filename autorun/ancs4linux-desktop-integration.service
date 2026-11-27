@@ -12,7 +12,7 @@ StartLimitBurst=10
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/ancs4linux-desktop-integration
+ExecStart=/opt/ancs4linux/venv/bin/ancs4linux-desktop-integration
 Restart=on-failure
 RestartSec=5
 
