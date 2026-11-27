@@ -1,11 +1,20 @@
 [Unit]
 Description=ancs4linux Desktop Integration daemon (should run as user)
-Requires=bluetooth.target
-After=bluetooth.target
+# This daemon only talks D-Bus (system bus: ancs4linux daemons, session bus:
+# notification server), it does not need Bluetooth itself. It is only useful
+# inside a graphical session, where a notification server runs.
+PartOf=graphical-session.target
+After=graphical-session.target
+# Retry for a while (the notification server or the system daemons may come
+# up after us at login), but don't crash-loop forever.
+StartLimitIntervalSec=120
+StartLimitBurst=10
 
 [Service]
 Type=simple
 ExecStart=/usr/local/bin/ancs4linux-desktop-integration
+Restart=on-failure
+RestartSec=5
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
